@@ -1,0 +1,46 @@
+digraph EpicsBreakdown {
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=11];
+    edge [fontname="PingFang SC", fontsize=9];
+    graph [fontname="PingFang SC", fontsize=14];
+    nodesep=0.5;
+    ranksep=0.7;
+
+    prd [label="prd.md", fillcolor="#C8E6C9", color="#2E7D32", penwidth=2, shape=note];
+
+    subgraph cluster_epic1 {
+        label="Epic 1：用户认证";
+        style=filled; fillcolor="#E3F2FD"; color="#1565C0"; penwidth=2;
+        fontname="PingFang SC";
+        s11 [label="Story 1-1\n用户注册（邮箱验证码）", fillcolor="#BBDEFB"];
+        s12 [label="Story 1-2\n用户登录", fillcolor="#BBDEFB"];
+        s13 [label="Story 1-3\n密码找回", fillcolor="#BBDEFB"];
+    }
+
+    subgraph cluster_epic2 {
+        label="Epic 2：需求管理核心";
+        style=filled; fillcolor="#E8F5E9"; color="#2E7D32"; penwidth=2;
+        fontname="PingFang SC";
+        s21 [label="Story 2-1\n需求看板视图", fillcolor="#C8E6C9"];
+        s22 [label="Story 2-2\n手动录入需求", fillcolor="#C8E6C9"];
+        s23 [label="Story 2-3\n需求状态流转", fillcolor="#C8E6C9"];
+    }
+
+    subgraph cluster_epic3 {
+        label="Epic 3：客户协作";
+        style=filled; fillcolor="#FFF3E0"; color="#E65100"; penwidth=2;
+        fontname="PingFang SC";
+        s31 [label="Story 3-1\n客户提交链接生成", fillcolor="#FFE0B2"];
+        s32 [label="Story 3-2\n客户无注册提交需求", fillcolor="#FFE0B2"];
+        s33 [label="Story 3-3\n客户确认完成", fillcolor="#FFCC80"];
+    }
+
+    sprint [label="sprint-status.yaml\n（下游：Sprint 计划）", fillcolor="#D1C4E9", color="#6A1B9A", penwidth=2, shape=note];
+
+    prd -> s11;
+    prd -> s21;
+    prd -> s31;
+    s13 -> sprint [style=dashed, label="拆解完成后"];
+    s23 -> sprint [style=dashed];
+    s33 -> sprint [style=dashed];
+}

@@ -1,0 +1,28 @@
+digraph DevCycle {
+    rankdir=LR;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=12];
+    edge [fontname="PingFang SC", fontsize=10];
+    graph [fontname="PingFang SC", fontsize=14];
+    nodesep=0.8;
+    ranksep=1.0;
+
+    create_story [label="create-story\n准备 Story 上下文", fillcolor="#BBDEFB", color="#1565C0", penwidth=2];
+    atdd [label="testarch-atdd\n写失败测试（可选）", fillcolor="#F8BBD0", color="#880E4F", penwidth=2];
+    dev_story [label="dev-story\n实现代码", fillcolor="#C8E6C9", color="#1B5E20", penwidth=2];
+    code_review [label="code-review\n三层代码审查", fillcolor="#FFE0B2", color="#E65100", penwidth=2];
+
+    pass [label="✓ 通过\n更新 sprint-status", fillcolor="#A5D6A7", shape=ellipse, color="#2E7D32", penwidth=2];
+    fail [label="✗ Critical 问题\n需要修复", fillcolor="#FFCDD2", shape=ellipse, color="#C62828", penwidth=2];
+
+    next [label="下一个 Story", fillcolor="#E3F2FD", shape=ellipse];
+
+    create_story -> atdd [label="TDD 路径", style=dashed, color="#9C27B0"];
+    create_story -> dev_story [label="普通路径"];
+    atdd -> dev_story [label="测试驱动实现"];
+    dev_story -> code_review;
+    code_review -> pass [label="无 Critical 问题"];
+    code_review -> fail [label="有 Critical 问题"];
+    fail -> dev_story [label="修复后重新提交"];
+    pass -> next;
+    next -> create_story [label="循环执行", style=dashed, color="#666"];
+}

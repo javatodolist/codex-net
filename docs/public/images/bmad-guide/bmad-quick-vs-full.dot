@@ -1,0 +1,56 @@
+digraph QuickVsFull {
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=11];
+    edge [fontname="PingFang SC", fontsize=9];
+    graph [fontname="PingFang SC", fontsize=14];
+    nodesep=0.6;
+    ranksep=0.7;
+
+    req [label="收到开发需求", fillcolor="#FFF9C4", color="#F57F17", penwidth=2, shape=diamond];
+
+    subgraph cluster_full {
+        label="完整流程（新项目 / 复杂功能）";
+        style=filled;
+        fillcolor="#E8F5E9";
+        color="#2E7D32";
+        penwidth=2;
+        fontname="PingFang SC";
+
+        f1 [label="product-brief\n产品简报", fillcolor="#C8E6C9"];
+        f2 [label="create-prd\n需求文档", fillcolor="#C8E6C9"];
+        f3 [label="create-architecture\n技术架构", fillcolor="#C8E6C9"];
+        f4 [label="create-epics-and-stories\n任务拆解", fillcolor="#C8E6C9"];
+        f5 [label="sprint-planning\nSprint 计划", fillcolor="#A5D6A7"];
+        f6 [label="create-story → dev-story\n按 Story 逐个开发", fillcolor="#81C784", fontcolor="white"];
+    }
+
+    subgraph cluster_quick {
+        label="快速通道（小改动 / Bug 修复）";
+        style=filled;
+        fillcolor="#FFF3E0";
+        color="#E65100";
+        penwidth=2;
+        fontname="PingFang SC";
+
+        q1 [label="quick-spec\n快速技术规范（5 分钟）", fillcolor="#FFE0B2"];
+        q2 [label="quick-dev\n直接实现", fillcolor="#FFCC80"];
+    }
+
+    subgraph cluster_ultra {
+        label="极速通道（实验性）";
+        style=filled;
+        fillcolor="#E3F2FD";
+        color="#1565C0";
+        penwidth=2;
+        fontname="PingFang SC";
+
+        u1 [label="quick-dev-new-preview\n一步完成：理解→规划→实现→审查", fillcolor="#BBDEFB"];
+    }
+
+    req -> f1 [label="复杂 / 新项目"];
+    req -> q1 [label="小改动 / 单功能"];
+    req -> u1 [label="极简 / 实验性"];
+
+    f1 -> f2 -> f3 -> f4 -> f5 -> f6;
+    q1 -> q2;
+}

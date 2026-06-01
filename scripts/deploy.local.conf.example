@@ -1,0 +1,11 @@
+# 部署配置（复制为 deploy.local.conf 并填写实际值）
+# deploy.local.conf 不会提交到 git
+
+REMOTE_HOST="YOUR_SERVER_IP"
+REMOTE_USER="root"
+REMOTE_DIR="/www/wwwroot/codex-net"
+# SSH_KEY="~/.ssh/id_rsa"  # 可选，指定 SSH 密钥
+
+# 百度站长平台「普通收录」主动推送 token（可选）
+# 在 ziyuan.baidu.com → 资源提交 → 普通收录 → API 提交 获取
+# BAIDU_PUSH_TOKEN="YOUR_BAIDU_PUSH_TOKEN"

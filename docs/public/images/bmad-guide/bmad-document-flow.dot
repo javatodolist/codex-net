@@ -1,0 +1,72 @@
+digraph DocumentFlow {
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=12];
+    edge [fontname="PingFang SC", fontsize=10];
+    graph [fontname="PingFang SC", fontsize=14];
+    nodesep=0.6;
+    ranksep=0.7;
+
+    // 想法阶段
+    idea [label="💡 产品想法", fillcolor="#FFF9C4", color="#F57F17", penwidth=2, shape=ellipse];
+
+    // 规划文档
+    subgraph cluster_plan {
+        label="规划产物（planning-artifacts/）";
+        style=filled;
+        fillcolor="#FFF3E0";
+        color="#E65100";
+        penwidth=2;
+        fontname="PingFang SC";
+
+        brief [label="product-brief.md\n产品简报", fillcolor="#FFE0B2"];
+        research [label="technical-research.md\n技术选型报告", fillcolor="#FFE0B2"];
+        prd [label="prd.md\n产品需求文档", fillcolor="#FFCC80"];
+        ux [label="ux-design.md\nUX 设计规范", fillcolor="#FFE0B2"];
+        arch [label="architecture.md\n技术架构", fillcolor="#FFCC80"];
+        epics [label="epics-and-stories.md\nEpics + Stories", fillcolor="#FFCC80"];
+    }
+
+    // 实现产物
+    subgraph cluster_impl {
+        label="实现产物（implementation-artifacts/）";
+        style=filled;
+        fillcolor="#E8F5E9";
+        color="#2E7D32";
+        penwidth=2;
+        fontname="PingFang SC";
+
+        sprint [label="sprint-status.yaml\nSprint 计划", fillcolor="#C8E6C9"];
+        story [label="story-X-X.md\nStory 文件", fillcolor="#A5D6A7"];
+        code [label="💻 代码实现", fillcolor="#81C784", fontcolor="white", shape=ellipse];
+    }
+
+    // 测试产物
+    subgraph cluster_test {
+        label="测试产物（test-artifacts/）";
+        style=filled;
+        fillcolor="#EDE7F6";
+        color="#6A1B9A";
+        penwidth=2;
+        fontname="PingFang SC";
+
+        testplan [label="test-design.md\n测试计划", fillcolor="#D1C4E9"];
+        testcode [label="tests/\n自动化测试", fillcolor="#B39DDB"];
+    }
+
+    // 流转关系
+    idea -> brief [label="/bmad-create-product-brief"];
+    brief -> research [label="/bmad-technical-research"];
+    brief -> prd [label="/bmad-create-prd"];
+    research -> prd [style=dashed, color="#999"];
+    prd -> ux [label="/bmad-create-ux-design"];
+    prd -> arch [label="/bmad-create-architecture"];
+    ux -> arch [style=dashed, color="#999"];
+    arch -> epics [label="/bmad-create-epics-and-stories"];
+    epics -> sprint [label="/bmad-sprint-planning"];
+    sprint -> story [label="/bmad-create-story"];
+    story -> code [label="/bmad-dev-story"];
+    code -> code [label="/bmad-code-review", style=dashed];
+
+    prd -> testplan [label="/bmad-testarch-test-design", style=dashed, color="#9C27B0"];
+    code -> testcode [label="/bmad-testarch-atdd", style=dashed, color="#9C27B0"];
+}

@@ -1,0 +1,79 @@
+digraph BMADArchitecture {
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=12];
+    edge [fontname="PingFang SC", fontsize=10];
+    graph [fontname="PingFang SC", fontsize=14];
+    splines=ortho;
+    nodesep=0.8;
+    ranksep=0.9;
+
+    // BMB 模块（扩展层 - 顶部）
+    subgraph cluster_bmb {
+        label="BMB 模块 — 扩展层";
+        style=filled;
+        fillcolor="#FFF3E0";
+        color="#E65100";
+        penwidth=2;
+        fontsize=13;
+        fontname="PingFang SC";
+
+        bmb1 [label="bmad-agent-builder\n构建自定义 Agent", fillcolor="#FFE0B2"];
+        bmb2 [label="bmad-workflow-builder\n构建自定义工作流", fillcolor="#FFE0B2"];
+    }
+
+    // TEA 模块（质量保障层）
+    subgraph cluster_tea {
+        label="TEA 模块 — 质量保障";
+        style=filled;
+        fillcolor="#FCE4EC";
+        color="#880E4F";
+        penwidth=2;
+        fontsize=13;
+        fontname="PingFang SC";
+
+        tea1 [label="bmad-testarch-atdd\nTDD 验收测试", fillcolor="#F8BBD0"];
+        tea2 [label="bmad-testarch-ci\nCI/CD 质量门禁", fillcolor="#F8BBD0"];
+        tea3 [label="bmad-testarch-framework\n测试框架初始化", fillcolor="#F8BBD0"];
+    }
+
+    // BMM 模块（主流程层）
+    subgraph cluster_bmm {
+        label="BMM 模块 — 产品开发主流程";
+        style=filled;
+        fillcolor="#E8F5E9";
+        color="#1B5E20";
+        penwidth=2;
+        fontsize=13;
+        fontname="PingFang SC";
+
+        bmm1 [label="bmad-create-prd\n产品需求文档", fillcolor="#C8E6C9"];
+        bmm2 [label="bmad-create-architecture\n技术架构设计", fillcolor="#C8E6C9"];
+        bmm3 [label="bmad-dev-story\nStory 开发执行", fillcolor="#C8E6C9"];
+        bmm4 [label="bmad-code-review\n代码审查", fillcolor="#C8E6C9"];
+        bmm5 [label="bmad-sprint-planning\nSprint 计划", fillcolor="#C8E6C9"];
+    }
+
+    // Core 模块（基础能力层 - 底部）
+    subgraph cluster_core {
+        label="Core 模块 — 基础能力";
+        style=filled;
+        fillcolor="#E3F2FD";
+        color="#0D47A1";
+        penwidth=2;
+        fontsize=13;
+        fontname="PingFang SC";
+
+        core1 [label="bmad-distillator\n文档无损压缩", fillcolor="#BBDEFB"];
+        core2 [label="bmad-review-adversarial\n对抗性审查", fillcolor="#BBDEFB"];
+        core3 [label="bmad-help\n智能导航", fillcolor="#BBDEFB"];
+    }
+
+    // 层级关系（虚线表示依赖）
+    bmb1 -> bmm3 [style=dashed, color="#999999", label="扩展"];
+    bmb2 -> bmm1 [style=dashed, color="#999999"];
+    tea1 -> bmm3 [style=dashed, color="#CE93D8", label="质量保障"];
+    tea2 -> bmm4 [style=dashed, color="#CE93D8"];
+    bmm1 -> core1 [style=dashed, color="#90CAF9", label="基础支撑"];
+    bmm3 -> core2 [style=dashed, color="#90CAF9"];
+    bmm5 -> core3 [style=dashed, color="#90CAF9"];
+}

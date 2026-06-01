@@ -1,0 +1,960 @@
+
+<!DOCTYPE HTML>
+<html lang="zh-Hans" >
+    <head>
+        <meta charset="UTF-8">
+        <title>第 9 章 Harness Engineering 十条原则 · Harness Engineering：Claude Code 设计指南</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="围绕 Claude Code 的运行时骨架展开，重点讨论控制面、连续性、恢复路径与验证分工。">
+        <meta name="generator" content="HonKit 6.1.7">
+        <meta name="author" content="OpenAI Codex">
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/@honkit/honkit-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/@honkit/honkit-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+        <link rel="stylesheet" href="styles/website.css">
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="appendix-a-checklists.html" />
+    
+    
+    <link rel="prev" href="chapter-08-team-landing-practices.html" />
+    
+
+    <style>
+:root {
+  --hb-page-bg: #f7f2e8;
+  --hb-page-bg-soft: #efe8d9;
+  --hb-panel-bg: rgba(252, 248, 239, 0.86);
+  --hb-panel-strong: rgba(247, 241, 230, 0.96);
+  --hb-summary-width: 320px;
+  --hb-nav-bg: rgba(249, 245, 237, 0.82);
+  --hb-nav-border: rgba(53, 41, 27, 0.12);
+  --hb-nav-text: #2d2418;
+  --hb-nav-muted: #756756;
+  --hb-nav-pill: rgba(255, 252, 245, 0.82);
+  --hb-nav-pill-active: #2d2418;
+  --hb-nav-pill-active-text: #f8f4ea;
+  --hb-shadow: 0 20px 46px rgba(53, 41, 27, 0.10);
+  --hb-shadow-soft: 0 10px 24px rgba(53, 41, 27, 0.08);
+}
+
+.book.with-site-switcher {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Noto Serif SC", "Source Han Serif SC", serif;
+  background:
+    radial-gradient(circle at top left, rgba(187, 145, 94, 0.12), transparent 24%),
+    radial-gradient(circle at right 12% top 10%, rgba(135, 89, 50, 0.10), transparent 18%),
+    linear-gradient(180deg, var(--hb-page-bg) 0%, var(--hb-page-bg-soft) 100%);
+}
+
+.book.with-site-switcher .book-summary {
+  left: calc(-1 * var(--hb-summary-width));
+  width: var(--hb-summary-width);
+  background: rgba(242, 235, 223, 0.72);
+  border-right: 1px solid rgba(53, 41, 27, 0.08);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.35);
+}
+
+.book.with-site-switcher.with-summary .book-summary {
+  left: 0;
+}
+
+.book.with-site-switcher .book-summary {
+  padding-top: 76px;
+}
+
+.book.with-site-switcher .book-body {
+  padding-top: 76px;
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .body-inner {
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .page-wrapper {
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner {
+  max-width: 940px;
+  margin: 22px auto 36px;
+  padding: 38px 44px 42px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent 100%),
+    var(--hb-panel-bg);
+  box-shadow: var(--hb-shadow);
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal {
+  color: #33291d;
+  font-size: 17px;
+  line-height: 1.92;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h1,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h2,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h3 {
+  color: #211912;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h1 {
+  margin-top: 0.2em;
+  margin-bottom: 0.7em;
+  font-size: 2.15em;
+  line-height: 1.15;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h2 {
+  margin-top: 1.7em;
+  font-size: 1.5em;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal p,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal li,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal blockquote {
+  max-width: 38em;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal blockquote {
+  margin: 1.5rem 0;
+  padding: 0.2rem 0 0.2rem 1rem;
+  border-left: 3px solid rgba(135, 89, 50, 0.34);
+  color: #5e5245;
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal a {
+  color: #875932;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal code {
+  padding: 0.12em 0.35em;
+  border-radius: 6px;
+  background: rgba(135, 89, 50, 0.09);
+  color: #5c3b22;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal pre {
+  border-radius: 18px;
+  border: 1px solid rgba(53, 41, 27, 0.08);
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.book.with-site-switcher .hb-agentway-cta {
+  margin: 28px 0 6px;
+  padding: 18px 18px 16px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent 100%),
+    rgba(247, 241, 230, 0.86);
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.book.with-site-switcher .hb-agentway-cta__eyebrow {
+  margin: 0 0 8px;
+  color: #875932;
+  font-family: "Avenir Next", "PingFang SC", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.book.with-site-switcher .hb-agentway-cta h3 {
+  margin: 0;
+  color: #1f1812;
+  font-size: 1.26rem;
+  line-height: 1.3;
+}
+
+.book.with-site-switcher .hb-agentway-cta p {
+  margin: 10px 0 0;
+  max-width: none;
+  color: #4f4336;
+}
+
+.book.with-site-switcher .hb-agentway-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.book.with-site-switcher .hb-agentway-cta__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  background: rgba(255, 252, 245, 0.82);
+  color: #2d2418;
+  font-family: "Avenir Next", "PingFang SC", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.book.with-site-switcher .hb-agentway-cta__link--primary {
+  background: #312015;
+  border-color: #312015;
+  color: #f8f4ea;
+}
+
+.book.with-site-switcher #book-search-input {
+  margin: 0 16px 12px;
+  padding: 0;
+  background: transparent;
+}
+
+.book.with-site-switcher #book-search-input input {
+  height: 44px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  border-radius: 999px;
+  background: rgba(255, 252, 245, 0.78);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  color: #3a2e22;
+  font-size: 14px;
+}
+
+.book.with-site-switcher .summary {
+  padding-bottom: 32px;
+}
+
+.book.with-site-switcher .summary li a,
+.book.with-site-switcher .summary li span {
+  color: #5d5042;
+  border-bottom: none;
+}
+
+.book.with-site-switcher .summary li.chapter.active > a,
+.book.with-site-switcher .summary li.active > a {
+  color: #1f1812;
+  font-weight: 700;
+}
+
+.book.with-site-switcher .summary li.chapter {
+  margin: 2px 10px;
+  border-radius: 14px;
+}
+
+.book.with-site-switcher .summary li.chapter > a {
+  border-radius: 14px;
+}
+
+.book.with-site-switcher .summary li.chapter.active > a {
+  background: rgba(255, 252, 245, 0.70);
+}
+
+.book.with-site-switcher .book-header {
+  border-bottom: 1px solid rgba(53, 41, 27, 0.08);
+  background: rgba(249, 244, 235, 0.58);
+}
+
+.hb-site-switcher {
+  position: fixed;
+  top: 10px;
+  left: 14px;
+  right: 14px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--hb-nav-border);
+  border-radius: 22px;
+  background: var(--hb-nav-bg);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.hb-site-switcher__brand {
+  min-width: 0;
+  padding-left: 4px;
+}
+
+.hb-site-switcher__eyebrow {
+  margin: 0 0 2px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hb-nav-muted);
+}
+
+.hb-site-switcher__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--hb-nav-text);
+}
+
+.hb-site-switcher__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+@media screen and (min-width: 600px) {
+  .book.with-site-switcher.with-summary .book-body {
+    left: var(--hb-summary-width);
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .book.with-site-switcher .book-summary {
+    left: calc(-1 * var(--hb-summary-width));
+  }
+
+  .book.with-site-switcher.with-summary .book-summary {
+    left: 0;
+  }
+
+  .book.with-site-switcher.with-summary .book-body {
+    -webkit-transform: translateX(var(--hb-summary-width));
+    -moz-transform: translateX(var(--hb-summary-width));
+    -ms-transform: translateX(var(--hb-summary-width));
+    -o-transform: translateX(var(--hb-summary-width));
+    transform: translateX(var(--hb-summary-width));
+  }
+}
+
+.hb-site-switcher__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--hb-nav-border);
+  border-radius: 999px;
+  background: var(--hb-nav-pill);
+  color: var(--hb-nav-text);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 120ms ease, background-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
+}
+
+.hb-site-switcher__link:hover,
+.hb-site-switcher__link:focus-visible {
+  transform: translateY(-1px);
+  text-decoration: none;
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.hb-site-switcher__link.is-active {
+  background: var(--hb-nav-pill-active);
+  border-color: var(--hb-nav-pill-active);
+  color: var(--hb-nav-pill-active-text);
+}
+
+@media (max-width: 860px) {
+  :root {
+    --hb-summary-width: 290px;
+  }
+
+  .book.with-site-switcher .book-summary,
+  .book.with-site-switcher .book-body {
+    padding-top: 92px;
+  }
+
+  .hb-site-switcher {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    align-items: center;
+    padding: 8px 10px;
+    gap: 10px;
+  }
+
+  .book.with-site-switcher .book-summary {
+    width: var(--hb-summary-width);
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner {
+    margin: 18px 14px 28px;
+    padding: 28px 24px 30px;
+  }
+
+  .hb-site-switcher__links {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+  }
+
+  .hb-site-switcher__link {
+    min-width: fit-content;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --hb-summary-width: min(86vw, 320px);
+  }
+
+  .book.with-site-switcher .book-summary,
+  .book.with-site-switcher .book-body {
+    padding-top: 86px;
+  }
+
+  .book.with-site-switcher .book-summary {
+    width: var(--hb-summary-width);
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner {
+    margin: 12px 8px 20px;
+    padding: 20px 16px 22px;
+    border-radius: 22px;
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner section.normal {
+    font-size: 16px;
+    line-height: 1.82;
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h1 {
+    font-size: 1.75em;
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h2 {
+    font-size: 1.28em;
+  }
+
+  .hb-site-switcher {
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 10px;
+    border-radius: 18px;
+  }
+
+  .hb-site-switcher__brand {
+    width: 100%;
+    padding-left: 0;
+  }
+
+  .hb-site-switcher__eyebrow {
+    display: none;
+  }
+
+  .hb-site-switcher__links {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .hb-site-switcher__links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hb-site-switcher__link {
+    flex: 0 0 auto;
+    min-height: 32px;
+    padding: 0 10px;
+  }
+
+  .hb-site-switcher__title {
+    font-size: 12px;
+  }
+
+  .book.with-site-switcher .hb-agentway-cta {
+    margin-top: 22px;
+    padding: 16px 14px 14px;
+    border-radius: 18px;
+  }
+
+  .book.with-site-switcher .hb-agentway-cta__actions {
+    flex-direction: column;
+  }
+
+  .book.with-site-switcher .hb-agentway-cta__link {
+    width: 100%;
+  }
+}
+</style>
+
+    <link rel="canonical" href="chapter-09-ten-principles.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Harness Books">
+    <meta property="og:title" content="第 9 章 Harness Engineering 十条原则 · Harness Engineering：Claude Code 设计指南">
+    <meta property="og:description" content="围绕 Claude Code 的运行时骨架展开，重点讨论控制面、连续性、恢复路径与验证分工。">
+    <meta property="og:url" content="https://harness-books.agentway.dev/book1-claude-code/chapter-09-ten-principles.html">
+    <meta property="og:image" content="https://harness-books.agentway.dev/og/book1-claude-code/chapter-09-ten-principles.svg">
+    <meta property="og:image:alt" content="Harness Engineering：Claude Code 设计指南 封面">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="第 9 章 Harness Engineering 十条原则 · Harness Engineering：Claude Code 设计指南">
+    <meta name="twitter:description" content="围绕 Claude Code 的运行时骨架展开，重点讨论控制面、连续性、恢复路径与验证分工。">
+    <meta name="twitter:image" content="https://harness-books.agentway.dev/og/book1-claude-code/chapter-09-ten-principles.svg">
+    <meta name="twitter:image:alt" content="Harness Engineering：Claude Code 设计指南 封面">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "第 9 章 Harness Engineering 十条原则 · Harness Engineering：Claude Code 设计指南", "description": "围绕 Claude Code 的运行时骨架展开，重点讨论控制面、连续性、恢复路径与验证分工。", "url": "https://harness-books.agentway.dev/book1-claude-code/chapter-09-ten-principles.html", "image": "https://harness-books.agentway.dev/og/book1-claude-code/chapter-09-ten-principles.svg", "isPartOf": {"@type": "Book", "name": "Harness Engineering：Claude Code 设计指南", "url": "https://harness-books.agentway.dev/book1-claude-code/"}, "author": {"@type": "Organization", "name": "AgentWay", "url": "https://agentway.dev"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Book", "name": "Harness Engineering：Claude Code 设计指南", "url": "https://harness-books.agentway.dev/book1-claude-code/", "description": "一部从 Claude Code 源码抽象 AI 编程系统工程原则的中文书稿。", "author": {"@type": "Organization", "name": "AgentWay", "url": "https://agentway.dev"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Harness Books", "item": "https://harness-books.agentway.dev/"}, {"@type": "ListItem", "position": 2, "name": "Harness Engineering：Claude Code 设计指南", "item": "https://harness-books.agentway.dev/book1-claude-code/"}, {"@type": "ListItem", "position": 3, "name": "第 9 章 Harness Engineering 十条原则", "item": "https://harness-books.agentway.dev/book1-claude-code/chapter-09-ten-principles.html"}]}</script>
+</head>
+    <body>
+<div class="hb-site-switcher" role="navigation" aria-label="Book switcher"><div class="hb-site-switcher__brand"><p class="hb-site-switcher__eyebrow">Harness Books</p><p class="hb-site-switcher__title">Harness Engineering：Claude Code 设计指南</p></div><div class="hb-site-switcher__links"><a class="hb-site-switcher__link" href="https://harness-books.agentway.dev/index.html">首页</a><a class="hb-site-switcher__link is-active" href="index.html">Harness Engineering：Claude Code 设计指南</a><a class="hb-site-switcher__link" href="https://harness-books.agentway.dev/book2-comparing/">Claude Code 和 Codex 的 Harness 设计哲学</a><a class="hb-site-switcher__link" href="exported/book1-claude-code.pdf" download>下载 PDF</a></div></div>
+        
+<div class="book honkit-cloak with-site-switcher">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="輸入並搜尋" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="index.html">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="./">
+            
+                <a href="index.html">
+            
+                    
+                    导读
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="preface.html">
+            
+                <a href="preface.html">
+            
+                    
+                    序言 Harness、终端与工程约束
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="chapter-01-why-harness-engineering.html">
+            
+                <a href="chapter-01-why-harness-engineering.html">
+            
+                    
+                    第 1 章 为什么需要 Harness Engineering
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="chapter-02-prompt-is-control-plane.html">
+            
+                <a href="chapter-02-prompt-is-control-plane.html">
+            
+                    
+                    第 2 章 Prompt 不是人格，Prompt 是控制平面
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="chapter-03-query-loop-heartbeat.html">
+            
+                <a href="chapter-03-query-loop-heartbeat.html">
+            
+                    
+                    第 3 章 Query Loop：代理系统的心跳
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="chapter-04-tools-permissions-interrupts.html">
+            
+                <a href="chapter-04-tools-permissions-interrupts.html">
+            
+                    
+                    第 4 章 工具、权限与中断：为什么代理不能直接碰世界
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8" data-path="chapter-05-context-memory-compact.html">
+            
+                <a href="chapter-05-context-memory-compact.html">
+            
+                    
+                    第 5 章 上下文治理：Memory、CLAUDE.md 与 Compact 是预算制度
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9" data-path="chapter-06-errors-and-recovery.html">
+            
+                <a href="chapter-06-errors-and-recovery.html">
+            
+                    
+                    第 6 章 错误与恢复：出错后仍能继续工作的代理系统
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.10" data-path="chapter-07-multi-agent-and-verification.html">
+            
+                <a href="chapter-07-multi-agent-and-verification.html">
+            
+                    
+                    第 7 章 多代理与验证：用分工和验证管理不稳定性
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.11" data-path="chapter-08-team-landing-practices.html">
+            
+                <a href="chapter-08-team-landing-practices.html">
+            
+                    
+                    第 8 章 团队落地：把一个聪明工具变成可复用制度
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.12" data-path="chapter-09-ten-principles.html">
+            
+                <a href="chapter-09-ten-principles.html">
+            
+                    
+                    第 9 章 Harness Engineering 十条原则
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.13" data-path="appendix-a-checklists.html">
+            
+                <a href="appendix-a-checklists.html">
+            
+                    
+                    附录 A 检查清单：把原则落成能执行的约束
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.14" data-path="appendix-b-diagram-notes.html">
+            
+                <a href="appendix-b-diagram-notes.html">
+            
+                    
+                    附录 B 图示：把运行时骨架画出来
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.15" data-path="appendix-c-source-map.html">
+            
+                <a href="appendix-c-source-map.html">
+            
+                    
+                    附录 C 源码地图：本书各章主要依据哪些文件
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://github.com/honkit/honkit" target="blank" class="gitbook-link">
+            本書使用 HonKit 釋出
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="index.html" >第 9 章 Harness Engineering 十条原则</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="第-9-章-harness-engineering-十条原则">第 9 章 Harness Engineering 十条原则</h1>
+<p>写技术书有个坏习惯，讲完一堆细节以后，生怕下判断，仿佛只要把复杂性展示够了，就可以免除结论责任。其实不行。复杂归复杂，判断还是要下。因为团队真正带得走的，往往是若干能反复使用的原则，而不是某个版本的函数名。</p>
+<p>前面八章绕来绕去，无非是在逼近这样一个事实：模型不可靠，但系统仍然可以可靠；前提是你别把可靠性寄托在模型身上，而要把它做进 harness。</p>
+<p>这一章不再展开细讲，只把前面的论点压成十条原则。它们不是格言，也不是口号，它们来自 Claude Code 源码与工程结构里的工作判断。</p>
+<h2 id="91-把模型当不稳定部件，不要当同事">9.1 把模型当不稳定部件，不要当同事</h2>
+<p>同事可以被信任地承担职责，模型不能。模型也许能像同事一样说话，但它不会自动获得同事那种稳定性、责任感和持续判断力。你越早承认这一点，系统就越早开始长出权限、恢复、验证和回滚。</p>
+<h2 id="92-prompt-是控制面的一部分">9.2 Prompt 是控制面的一部分</h2>
+<p>system prompt 用来定义行为协议。它和 runtime、tool schema、memory、hook 一起组成控制平面。把 prompt 当人格设定，最后你会得到一个很会表演、但不受约束的系统。</p>
+<h2 id="93-query-loop-才是代理系统的心跳">9.3 Query loop 才是代理系统的心跳</h2>
+<p>真正的 agent 依赖一段持续的执行循环。输入治理、流式消费、工具调度、恢复分支、停止条件，都是这个心跳的一部分。没有 query loop 的系统，也许能做 demo，但还谈不上运行时。</p>
+<h2 id="94-工具是受管执行接口">9.4 工具是受管执行接口</h2>
+<p>一旦模型开始碰 shell、文件系统、Git 和网络，问题就从“它会不会说”变成“它会不会留下后果”。所以工具必须被调度、被授权、被中断、被补账。越危险的工具，越不能按普通能力对待。</p>
+<h2 id="95-上下文是工作内存">9.5 上下文是工作内存</h2>
+<p>能塞进上下文，不等于应该塞进去。长期规则、持久记忆、会话连续性和临时对话，应该分层治理。compact 的目标是保住继续工作的语义底座。上下文的标准是可治理。</p>
+<h2 id="96-错误路径就是主路径">9.6 错误路径就是主路径</h2>
+<p>prompt too long、max output tokens、中断、hook 回环、compact 自身失败，这些都是长会话代理迟早要面对的日常天气。恢复、熔断、限次、防死循环，必须在设计时就存在，而不是出问题以后再补。</p>
+<h2 id="97-恢复的目标是继续工作">9.7 恢复的目标是继续工作</h2>
+<p>截断之后最好的动作，通常是续写；压缩失败时最重要的是先让系统恢复呼吸。工程系统真正的礼貌，在于别把用户困在失败态里。</p>
+<h2 id="98-多代理的意义，是把不确定性分区">9.8 多代理的意义，是把不确定性分区</h2>
+<p>多代理会把研究、实现、验证、综合放进不同职责容器里。隔离状态，分离角色，最后由 coordinator 收束理解。并行真正带来的价值是更清楚。</p>
+<h2 id="99-验证必须独立，不能让系统自己给自己打分">9.9 验证必须独立，不能让系统自己给自己打分</h2>
+<p>实现者天然倾向于相信自己的改动“差不多行了”。模型更是如此。凡是重要任务，验证都应该成为独立阶段，最好还有独立角色。否则所谓“完成”，很快就会退化成“已经写完并且我觉得没问题”。</p>
+<h2 id="910-团队制度比个人技巧重要">9.10 团队制度比个人技巧重要</h2>
+<p>一个高手可以靠经验把代理驯服，一个团队不行。团队需要的是分层 <code>CLAUDE.md</code>、明确 approval、可执行 skill、生命周期 hook、可追踪 transcript 和统一验证定义。只有把个人经验制度化，代理系统才可能成为组织能力，而不是个人把戏。</p>
+<h2 id="911-最后一句话">9.11 最后一句话</h2>
+<p>如果一定要把全书再缩成一句话，那大概就是：</p>
+<blockquote>
+<p>Harness Engineering 关心的是：在模型并不可靠的前提下，系统仍然能表现出工程系统应有的行为。</p>
+</blockquote>
+<p>Claude Code 的源码真正教人的，是这种克制：它始终把不稳定性当已知前提，再围着这个前提设计 prompt、loop、tools、memory、compact、recovery、verification 和 team workflow。也正因为如此，它值得被当作设计样本。</p>
+<p>书写到这里，结论其实已经比过程简单。难的从来不在把原则说出来，而在愿不愿意承认：Harness 比激情重要，制度比聪明重要，验证比自信重要。谁把这三句话听进去了，大概就已经站在 Harness Engineering 的门口了。</p>
+
+                                
+                                </section>
+<aside class="hb-agentway-cta" aria-label="Continue on AgentWay"><p class="hb-agentway-cta__eyebrow">Continue On AgentWay</p><h3>先注册，再把书里的判断落成练习、路径和项目。</h3><p>这些书帮你看清 Harness 的骨架。AgentWay 负责把它接成可执行学习路径：先免费注册，拿到基础 track 与进度记录；准备动手做练习、flashcards、capstone 和进阶专题时，再升级高级版。</p><div class="hb-agentway-cta__actions"><a class="hb-agentway-cta__link hb-agentway-cta__link--primary" href="https://agentway.dev/zh/auth">免费注册</a><a class="hb-agentway-cta__link" href="https://agentway.dev/zh/pricing">解锁进阶路径</a></div></aside>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="chapter-08-team-landing-practices.html" class="navigation navigation-prev " aria-label="Previous page: 第 8 章 团队落地：把一个聪明工具变成可复用制度">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="appendix-a-checklists.html" class="navigation navigation-next " aria-label="Next page: 附录 A 检查清单：把原则落成能执行的约束">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"第 9 章 Harness Engineering 十条原则","level":"1.12","depth":1,"next":{"title":"附录 A 检查清单：把原则落成能执行的约束","level":"1.13","depth":1,"path":"appendix-a-checklists.md","ref":"appendix-a-checklists.md","articles":[]},"previous":{"title":"第 8 章 团队落地：把一个聪明工具变成可复用制度","level":"1.11","depth":1,"path":"chapter-08-team-landing-practices.md","ref":"chapter-08-team-landing-practices.md","articles":[]},"dir":"ltr"},"config":{"plugins":[],"cover_alt":"封面：Harness Engineering：Claude Code 设计指南","root":".","styles":{"website":"styles/website.css","pdf":"styles/pdf.css"},"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"release_date":"2026-04-01","theme":"default","author":"OpenAI Codex","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"outputs":{"print_html":"exported/book1-claude-code-print.html","pdf":"exported/book1-claude-code.pdf","print_pdf":"exported/book1-claude-code-print.pdf","book_pdf":"exported/book1-claude-code-book.pdf"},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"cover_image":"assets/cover-wxb.svg","readme_path":"index.md","title_page_lines":["从会用 Agent，到做出 Agent PoC","https://agentway.dev"],"variables":{},"title":"Harness Engineering：Claude Code 设计指南","language":"zh-Hans","gitbook":"*","description":"一部从 Claude Code 源码抽象 AI 编程系统工程原则的中文书稿。"},"file":{"path":"chapter-09-ten-principles.md","mtime":"2026-04-02T04:09:21.164Z","type":"markdown"},"gitbook":{"version":"6.1.7","time":"2026-04-02T04:11:42.555Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <noscript>
+        <style>
+            .honkit-cloak {
+                display: block !important;
+            }
+        </style>
+    </noscript>
+    <script>
+        // Restore sidebar state as critical path for prevent layout shift
+        function __init__getSidebarState(defaultValue){
+            var baseKey = "";
+            var key = baseKey + ":sidebar";
+            try {
+                var value = localStorage[key];
+                if (value === undefined) {
+                    return defaultValue;
+                }
+                var parsed = JSON.parse(value);
+                return parsed == null ? defaultValue : parsed;
+            } catch (e) {
+                return defaultValue;
+            }
+        }
+        function __init__restoreLastSidebarState() {
+            var isMobile = window.matchMedia("(max-width: 600px)").matches;
+            if (isMobile) {
+                // Init last state if not mobile
+                return;
+            }
+            var sidebarState = __init__getSidebarState(true);
+            var book = document.querySelector(".book");
+            // Show sidebar if it enabled
+            if (sidebarState && book) {
+                book.classList.add("without-animation", "with-summary");
+            }
+        }
+
+        try {
+            __init__restoreLastSidebarState();
+        } finally {
+            var book = document.querySelector(".book");
+            book.classList.remove("honkit-cloak");
+        }
+    </script>
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/@honkit/honkit-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

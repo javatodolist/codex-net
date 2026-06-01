@@ -1,0 +1,991 @@
+
+<!DOCTYPE HTML>
+<html lang="zh-Hans" >
+    <head>
+        <meta charset="UTF-8">
+        <title>第 4 章 工具、沙箱与策略语言：谁来阻止模型动手太快 · Claude Code 和 Codex 的 Harness 设计哲学</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="沿着控制面、状态、策略与本地治理比较 Claude Code 和 Codex 两条 harness 路线。">
+        <meta name="generator" content="HonKit 6.1.7">
+        <meta name="author" content="OpenAI Codex">
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/@honkit/honkit-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/@honkit/honkit-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+        <link rel="stylesheet" href="styles/website.css">
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="chapter-05-skills-hooks-and-local-governance.html" />
+    
+    
+    <link rel="prev" href="chapter-03-loop-thread-and-rollout.html" />
+    
+
+    <style>
+:root {
+  --hb-page-bg: #f7f2e8;
+  --hb-page-bg-soft: #efe8d9;
+  --hb-panel-bg: rgba(252, 248, 239, 0.86);
+  --hb-panel-strong: rgba(247, 241, 230, 0.96);
+  --hb-summary-width: 320px;
+  --hb-nav-bg: rgba(249, 245, 237, 0.82);
+  --hb-nav-border: rgba(53, 41, 27, 0.12);
+  --hb-nav-text: #2d2418;
+  --hb-nav-muted: #756756;
+  --hb-nav-pill: rgba(255, 252, 245, 0.82);
+  --hb-nav-pill-active: #2d2418;
+  --hb-nav-pill-active-text: #f8f4ea;
+  --hb-shadow: 0 20px 46px rgba(53, 41, 27, 0.10);
+  --hb-shadow-soft: 0 10px 24px rgba(53, 41, 27, 0.08);
+}
+
+.book.with-site-switcher {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Noto Serif SC", "Source Han Serif SC", serif;
+  background:
+    radial-gradient(circle at top left, rgba(187, 145, 94, 0.12), transparent 24%),
+    radial-gradient(circle at right 12% top 10%, rgba(135, 89, 50, 0.10), transparent 18%),
+    linear-gradient(180deg, var(--hb-page-bg) 0%, var(--hb-page-bg-soft) 100%);
+}
+
+.book.with-site-switcher .book-summary {
+  left: calc(-1 * var(--hb-summary-width));
+  width: var(--hb-summary-width);
+  background: rgba(242, 235, 223, 0.72);
+  border-right: 1px solid rgba(53, 41, 27, 0.08);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.35);
+}
+
+.book.with-site-switcher.with-summary .book-summary {
+  left: 0;
+}
+
+.book.with-site-switcher .book-summary {
+  padding-top: 76px;
+}
+
+.book.with-site-switcher .book-body {
+  padding-top: 76px;
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .body-inner {
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .page-wrapper {
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner {
+  max-width: 940px;
+  margin: 22px auto 36px;
+  padding: 38px 44px 42px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent 100%),
+    var(--hb-panel-bg);
+  box-shadow: var(--hb-shadow);
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal {
+  color: #33291d;
+  font-size: 17px;
+  line-height: 1.92;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h1,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h2,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h3 {
+  color: #211912;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h1 {
+  margin-top: 0.2em;
+  margin-bottom: 0.7em;
+  font-size: 2.15em;
+  line-height: 1.15;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h2 {
+  margin-top: 1.7em;
+  font-size: 1.5em;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal p,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal li,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal blockquote {
+  max-width: 38em;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal blockquote {
+  margin: 1.5rem 0;
+  padding: 0.2rem 0 0.2rem 1rem;
+  border-left: 3px solid rgba(135, 89, 50, 0.34);
+  color: #5e5245;
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal a {
+  color: #875932;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal code {
+  padding: 0.12em 0.35em;
+  border-radius: 6px;
+  background: rgba(135, 89, 50, 0.09);
+  color: #5c3b22;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal pre {
+  border-radius: 18px;
+  border: 1px solid rgba(53, 41, 27, 0.08);
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.book.with-site-switcher .hb-agentway-cta {
+  margin: 28px 0 6px;
+  padding: 18px 18px 16px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent 100%),
+    rgba(247, 241, 230, 0.86);
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.book.with-site-switcher .hb-agentway-cta__eyebrow {
+  margin: 0 0 8px;
+  color: #875932;
+  font-family: "Avenir Next", "PingFang SC", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.book.with-site-switcher .hb-agentway-cta h3 {
+  margin: 0;
+  color: #1f1812;
+  font-size: 1.26rem;
+  line-height: 1.3;
+}
+
+.book.with-site-switcher .hb-agentway-cta p {
+  margin: 10px 0 0;
+  max-width: none;
+  color: #4f4336;
+}
+
+.book.with-site-switcher .hb-agentway-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.book.with-site-switcher .hb-agentway-cta__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  background: rgba(255, 252, 245, 0.82);
+  color: #2d2418;
+  font-family: "Avenir Next", "PingFang SC", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.book.with-site-switcher .hb-agentway-cta__link--primary {
+  background: #312015;
+  border-color: #312015;
+  color: #f8f4ea;
+}
+
+.book.with-site-switcher #book-search-input {
+  margin: 0 16px 12px;
+  padding: 0;
+  background: transparent;
+}
+
+.book.with-site-switcher #book-search-input input {
+  height: 44px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  border-radius: 999px;
+  background: rgba(255, 252, 245, 0.78);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  color: #3a2e22;
+  font-size: 14px;
+}
+
+.book.with-site-switcher .summary {
+  padding-bottom: 32px;
+}
+
+.book.with-site-switcher .summary li a,
+.book.with-site-switcher .summary li span {
+  color: #5d5042;
+  border-bottom: none;
+}
+
+.book.with-site-switcher .summary li.chapter.active > a,
+.book.with-site-switcher .summary li.active > a {
+  color: #1f1812;
+  font-weight: 700;
+}
+
+.book.with-site-switcher .summary li.chapter {
+  margin: 2px 10px;
+  border-radius: 14px;
+}
+
+.book.with-site-switcher .summary li.chapter > a {
+  border-radius: 14px;
+}
+
+.book.with-site-switcher .summary li.chapter.active > a {
+  background: rgba(255, 252, 245, 0.70);
+}
+
+.book.with-site-switcher .book-header {
+  border-bottom: 1px solid rgba(53, 41, 27, 0.08);
+  background: rgba(249, 244, 235, 0.58);
+}
+
+.hb-site-switcher {
+  position: fixed;
+  top: 10px;
+  left: 14px;
+  right: 14px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--hb-nav-border);
+  border-radius: 22px;
+  background: var(--hb-nav-bg);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.hb-site-switcher__brand {
+  min-width: 0;
+  padding-left: 4px;
+}
+
+.hb-site-switcher__eyebrow {
+  margin: 0 0 2px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hb-nav-muted);
+}
+
+.hb-site-switcher__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--hb-nav-text);
+}
+
+.hb-site-switcher__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+@media screen and (min-width: 600px) {
+  .book.with-site-switcher.with-summary .book-body {
+    left: var(--hb-summary-width);
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .book.with-site-switcher .book-summary {
+    left: calc(-1 * var(--hb-summary-width));
+  }
+
+  .book.with-site-switcher.with-summary .book-summary {
+    left: 0;
+  }
+
+  .book.with-site-switcher.with-summary .book-body {
+    -webkit-transform: translateX(var(--hb-summary-width));
+    -moz-transform: translateX(var(--hb-summary-width));
+    -ms-transform: translateX(var(--hb-summary-width));
+    -o-transform: translateX(var(--hb-summary-width));
+    transform: translateX(var(--hb-summary-width));
+  }
+}
+
+.hb-site-switcher__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--hb-nav-border);
+  border-radius: 999px;
+  background: var(--hb-nav-pill);
+  color: var(--hb-nav-text);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 120ms ease, background-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
+}
+
+.hb-site-switcher__link:hover,
+.hb-site-switcher__link:focus-visible {
+  transform: translateY(-1px);
+  text-decoration: none;
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.hb-site-switcher__link.is-active {
+  background: var(--hb-nav-pill-active);
+  border-color: var(--hb-nav-pill-active);
+  color: var(--hb-nav-pill-active-text);
+}
+
+@media (max-width: 860px) {
+  :root {
+    --hb-summary-width: 290px;
+  }
+
+  .book.with-site-switcher .book-summary,
+  .book.with-site-switcher .book-body {
+    padding-top: 92px;
+  }
+
+  .hb-site-switcher {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    align-items: center;
+    padding: 8px 10px;
+    gap: 10px;
+  }
+
+  .book.with-site-switcher .book-summary {
+    width: var(--hb-summary-width);
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner {
+    margin: 18px 14px 28px;
+    padding: 28px 24px 30px;
+  }
+
+  .hb-site-switcher__links {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+  }
+
+  .hb-site-switcher__link {
+    min-width: fit-content;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --hb-summary-width: min(86vw, 320px);
+  }
+
+  .book.with-site-switcher .book-summary,
+  .book.with-site-switcher .book-body {
+    padding-top: 86px;
+  }
+
+  .book.with-site-switcher .book-summary {
+    width: var(--hb-summary-width);
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner {
+    margin: 12px 8px 20px;
+    padding: 20px 16px 22px;
+    border-radius: 22px;
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner section.normal {
+    font-size: 16px;
+    line-height: 1.82;
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h1 {
+    font-size: 1.75em;
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h2 {
+    font-size: 1.28em;
+  }
+
+  .hb-site-switcher {
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 10px;
+    border-radius: 18px;
+  }
+
+  .hb-site-switcher__brand {
+    width: 100%;
+    padding-left: 0;
+  }
+
+  .hb-site-switcher__eyebrow {
+    display: none;
+  }
+
+  .hb-site-switcher__links {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .hb-site-switcher__links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hb-site-switcher__link {
+    flex: 0 0 auto;
+    min-height: 32px;
+    padding: 0 10px;
+  }
+
+  .hb-site-switcher__title {
+    font-size: 12px;
+  }
+
+  .book.with-site-switcher .hb-agentway-cta {
+    margin-top: 22px;
+    padding: 16px 14px 14px;
+    border-radius: 18px;
+  }
+
+  .book.with-site-switcher .hb-agentway-cta__actions {
+    flex-direction: column;
+  }
+
+  .book.with-site-switcher .hb-agentway-cta__link {
+    width: 100%;
+  }
+}
+</style>
+
+    <link rel="canonical" href="chapter-04-tools-sandbox-and-exec-policy.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Harness Books">
+    <meta property="og:title" content="第 4 章 工具、沙箱与策略语言：谁来阻止模型动手太快 · Claude Code 和 Codex 的 Harness 设计哲学">
+    <meta property="og:description" content="沿着控制面、状态、策略与本地治理比较 Claude Code 和 Codex 两条 harness 路线。">
+    <meta property="og:url" content="https://harness-books.agentway.dev/book2-comparing/chapter-04-tools-sandbox-and-exec-policy.html">
+    <meta property="og:image" content="https://harness-books.agentway.dev/og/book2-comparing/chapter-04-tools-sandbox-and-exec-policy.svg">
+    <meta property="og:image:alt" content="Claude Code 和 Codex 的 Harness 设计哲学 封面">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="第 4 章 工具、沙箱与策略语言：谁来阻止模型动手太快 · Claude Code 和 Codex 的 Harness 设计哲学">
+    <meta name="twitter:description" content="沿着控制面、状态、策略与本地治理比较 Claude Code 和 Codex 两条 harness 路线。">
+    <meta name="twitter:image" content="https://harness-books.agentway.dev/og/book2-comparing/chapter-04-tools-sandbox-and-exec-policy.svg">
+    <meta name="twitter:image:alt" content="Claude Code 和 Codex 的 Harness 设计哲学 封面">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "第 4 章 工具、沙箱与策略语言：谁来阻止模型动手太快 · Claude Code 和 Codex 的 Harness 设计哲学", "description": "沿着控制面、状态、策略与本地治理比较 Claude Code 和 Codex 两条 harness 路线。", "url": "https://harness-books.agentway.dev/book2-comparing/chapter-04-tools-sandbox-and-exec-policy.html", "image": "https://harness-books.agentway.dev/og/book2-comparing/chapter-04-tools-sandbox-and-exec-policy.svg", "isPartOf": {"@type": "Book", "name": "Claude Code 和 Codex 的 Harness 设计哲学", "url": "https://harness-books.agentway.dev/book2-comparing/"}, "author": {"@type": "Organization", "name": "AgentWay", "url": "https://agentway.dev"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Book", "name": "Claude Code 和 Codex 的 Harness 设计哲学", "url": "https://harness-books.agentway.dev/book2-comparing/", "description": "一部比较 Claude Code 与 Codex harness 设计哲学的工程长文。", "author": {"@type": "Organization", "name": "AgentWay", "url": "https://agentway.dev"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Harness Books", "item": "https://harness-books.agentway.dev/"}, {"@type": "ListItem", "position": 2, "name": "Claude Code 和 Codex 的 Harness 设计哲学", "item": "https://harness-books.agentway.dev/book2-comparing/"}, {"@type": "ListItem", "position": 3, "name": "第 4 章 工具、沙箱与策略语言：谁来阻止模型动手太快", "item": "https://harness-books.agentway.dev/book2-comparing/chapter-04-tools-sandbox-and-exec-policy.html"}]}</script>
+</head>
+    <body>
+<div class="hb-site-switcher" role="navigation" aria-label="Book switcher"><div class="hb-site-switcher__brand"><p class="hb-site-switcher__eyebrow">Harness Books</p><p class="hb-site-switcher__title">Claude Code 和 Codex 的 Harness 设计哲学</p></div><div class="hb-site-switcher__links"><a class="hb-site-switcher__link" href="https://harness-books.agentway.dev/index.html">首页</a><a class="hb-site-switcher__link" href="https://harness-books.agentway.dev/book1-claude-code/">Harness Engineering：Claude Code 设计指南</a><a class="hb-site-switcher__link is-active" href="index.html">Claude Code 和 Codex 的 Harness 设计哲学</a><a class="hb-site-switcher__link" href="exported/book2-comparing.pdf" download>下载 PDF</a></div></div>
+        
+<div class="book honkit-cloak with-site-switcher">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="輸入並搜尋" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="index.html">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="./">
+            
+                <a href="index.html">
+            
+                    
+                    导读
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="chapter-00-reading-map.html">
+            
+                <a href="chapter-00-reading-map.html">
+            
+                    
+                    阅读地图：如何理解第一本书与这本比较书
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="preface.html">
+            
+                <a href="preface.html">
+            
+                    
+                    序言 两套 Harness，不必假装是同一匹马的附件
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="chapter-01-why-this-comparison.html">
+            
+                <a href="chapter-01-why-this-comparison.html">
+            
+                    
+                    第 1 章 为什么要把 Claude Code 和 Codex 放在一起看
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="chapter-02-two-control-planes.html">
+            
+                <a href="chapter-02-two-control-planes.html">
+            
+                    
+                    第 2 章 两种控制面：Prompt 拼装与 Instruction Fragment
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="chapter-03-loop-thread-and-rollout.html">
+            
+                <a href="chapter-03-loop-thread-and-rollout.html">
+            
+                    
+                    第 3 章 心跳放在哪：Query Loop 对照 Thread、Rollout 与 State
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.8" data-path="chapter-04-tools-sandbox-and-exec-policy.html">
+            
+                <a href="chapter-04-tools-sandbox-and-exec-policy.html">
+            
+                    
+                    第 4 章 工具、沙箱与策略语言：谁来阻止模型动手太快
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9" data-path="chapter-05-skills-hooks-and-local-governance.html">
+            
+                <a href="chapter-05-skills-hooks-and-local-governance.html">
+            
+                    
+                    第 5 章 技能、Hook 与本地规则：系统如何学会守乡约
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.10" data-path="chapter-06-delegation-verification-and-state.html">
+            
+                <a href="chapter-06-delegation-verification-and-state.html">
+            
+                    
+                    第 6 章 委派、验证与持久状态：谁来防止系统自己给自己打高分
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.11" data-path="chapter-07-convergence-and-divergence.html">
+            
+                <a href="chapter-07-convergence-and-divergence.html">
+            
+                    
+                    第 7 章 殊途同归，还是各表一枝
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12" data-path="chapter-08-how-to-choose-or-build.html">
+            
+                <a href="chapter-08-how-to-choose-or-build.html">
+            
+                    
+                    第 8 章 如果你要自己做：该向谁学，先学什么
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.13" data-path="appendix-a-source-map.html">
+            
+                <a href="appendix-a-source-map.html">
+            
+                    
+                    附录 A 源码地图：这套比较主要依据哪些文件
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.14" data-path="appendix-b-checklists.html">
+            
+                <a href="appendix-b-checklists.html">
+            
+                    
+                    附录 B 检查清单：如何判断你的 Harness 更像 Claude Code、Codex，还是半成品
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://github.com/honkit/honkit" target="blank" class="gitbook-link">
+            本書使用 HonKit 釋出
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="index.html" >第 4 章 工具、沙箱与策略语言：谁来阻止模型动手太快</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="第-4-章-工具、沙箱与策略语言：谁来阻止模型动手太快">第 4 章 工具、沙箱与策略语言：谁来阻止模型动手太快</h1>
+<p><img src="diagrams/diag-03-tool-governance-comparison.png" alt="工具治理对比图"></img></p>
+<h2 id="41-真正危险的是开始执行">4.1 真正危险的是开始执行</h2>
+<p>一个模型说错话，通常只是浪费时间。一个模型执行错命令，就可能顺手把目录、仓库、进程和工作流一起带坏。所以真正把 AI coding system 区分开来的，是它调工具之前谁拥有最后解释权。</p>
+<p>Claude Code 和 Codex 在这件事上都很认真，但认真得不一样。</p>
+<p>Claude Code 更接近在运行时把工具纳入调度纪律。它有 <code>toolOrchestration.ts</code>、<code>toolExecution.ts</code>、<code>StreamingToolExecutor.ts</code>、<code>useCanUseTool.tsx</code>、Bash 专门 prompt 以及 allow/deny/ask 语义。它关心的是：这次工具调用能不能跑，怎么跑，能不能并发，用户有没有拒绝，跑到一半如何中断，结果怎么回到上下文。</p>
+<p>Codex 则把工具本身先做成类型化接口。<code>tools/src/lib.rs</code> 导出一整套工具构造器，<code>local_tool.rs</code> 则定义 <code>exec_command</code>、<code>shell</code>、<code>shell_command</code>、<code>request_permissions</code> 等 schema 结构。工具在 Codex 里首先是规范化的 API 面，其次才是执行单元。</p>
+<h2 id="42-claude-code：重点在运行时编排和危险动作约束">4.2 Claude Code：重点在运行时编排和危险动作约束</h2>
+<p>Claude Code 的工具系统有一种很强的现场调度感。并发要看 schema 和 <code>isConcurrencySafe()</code>；上下文修改要保证回放顺序稳定；流式工具执行还要考虑中断、synthetic result 和 UI 反馈。</p>
+<p>这套系统最像工程现实的地方，是它承认工具调用是“一个带后果的过程”，而非单个点动作。从这一点看，Claude Code 的 harness 很像给模型装了一个工地监工。工人当然可以干活，但监工得盯着：</p>
+<ul>
+<li>先做哪一个</li>
+<li>哪些能并行</li>
+<li>哪些必须串行</li>
+<li>做完以后怎么记账</li>
+<li>干到一半被叫停怎么办</li>
+</ul>
+<p>尤其是 Bash 这类高风险工具，Claude Code 的态度简直可以说是唠叨。可工程里真正成熟的系统，通常都会对最危险的接口变得唠叨。谁还在 shell 面前保持一种青年式的洒脱，多半还没有足够多的事故记忆。</p>
+<h2 id="43-codex：重点在工具-schema、审批参数和策略引擎">4.3 Codex：重点在工具 schema、审批参数和策略引擎</h2>
+<p>Codex 则更接近把“风险动作”的控制做成正式接口约束。</p>
+<p>以 <code>local_tool.rs</code> 为例，<code>exec_command</code> 这类工具会显式拥有这些字段，而不是简单接收一个字符串命令：</p>
+<ul>
+<li><code>cmd</code></li>
+<li><code>workdir</code></li>
+<li><code>shell</code></li>
+<li><code>tty</code></li>
+<li><code>yield_time_ms</code></li>
+<li><code>max_output_tokens</code></li>
+<li><code>login</code></li>
+<li>approval 相关参数</li>
+</ul>
+<p>而 <code>shell</code> / <code>shell_command</code> 还会在描述层面直接要求设置 <code>workdir</code>，提醒不要滥用 <code>cd</code>。这说明 Codex 不满足于“后台自己做对”，它还希望把正确使用方式嵌进工具定义本身。</p>
+<p>更进一步，Codex 把审批和权限提升抽成显式参数，把 <code>request_permissions</code> 做成单独工具，又把 <code>execpolicy</code> 单独做成 crate。这里的关键词已经超出简单的 permission，进入了更完整的策略层：</p>
+<ul>
+<li><code>Policy</code></li>
+<li><code>Rule</code></li>
+<li><code>Evaluation</code></li>
+<li><code>Decision</code></li>
+<li>parser</li>
+</ul>
+<p>这套命名几乎等于在说：执行边界已经形成一门小型政策语言，而不只是几个 if/else。</p>
+<h2 id="44-运行时审批对照策略语言">4.4 运行时审批对照策略语言</h2>
+<p>Claude Code 和 Codex 在工具风险控制上的分歧，可以概括为：</p>
+<ul>
+<li>Claude Code 偏运行时审批链</li>
+<li>Codex 偏显式策略语言与参数化审批</li>
+</ul>
+<p>Claude Code 的 ask/allow/deny 逻辑，很适合与具体工具调用现场紧密耦合。系统可以根据当前上下文、工具类型、用户动作和会话状态来决定是否继续。它的长处是灵敏，缺点是规则更容易藏在 runtime 逻辑里。</p>
+<p>Codex 的 exec policy 思路，则是尽量把规则抽离出来，让它成为可以单独解析、单独评估的实体。这种写法的长处，是规则可读性和可迁移性更强，也更适合团队级治理。缺点是系统会显得更重，而且你得认真维护 policy 设计，而不是把它当注释。</p>
+<p>说得粗一点：</p>
+<p>Claude Code 更接近“值班经理现场拍板”。</p>
+<p>Codex 更接近“公司先写好制度，再看这单是否合规”。</p>
+<h2 id="45-沙箱与审批，不只是安全问题，也是产品定义问题">4.5 沙箱与审批，不只是安全问题，也是产品定义问题</h2>
+<p>很多团队把沙箱、审批、权限看成安全附属件。这个看法有点轻慢。对于 coding agent 来说，这些东西其实定义了产品是什么。</p>
+<p>假如系统允许模型直接在用户目录里跑任意命令，那它就成了一个把风险转嫁给用户的 agent，而不只是“更强”。反过来，如果系统能明确表达 sandbox mode、network access、approval policy、additional directories、state DB 位置和 MCP tool approvals，那它给用户提供的就不只是能力，还有行为边界。</p>
+<p>Codex 在 <code>thread.ts</code> 里把这些 turn 级条件显式暴露出来，说明它把这些东西视为线程运行语义的一部分，而不是隐藏实现细节。Claude Code 则在工具执行、中断、permission hook 与 Bash 限制里，把边界压到运行时现场去执行。</p>
+<p>这意味着二者在产品哲学上也不一样：</p>
+<ul>
+<li>Claude Code 更接近“边做边看守”</li>
+<li>Codex 更接近“先给出执行契约，再开始做”</li>
+</ul>
+<h2 id="46-mcp、扩展工具与边界外移">4.6 MCP、扩展工具与边界外移</h2>
+<p>两套系统都支持把更多能力接进来，但方式仍然保留差异。</p>
+<p>Claude Code 更接近把 skill、hook、permission 和工具 prompt 拼接成一套场景化治理链。它擅长让本地规则跟着任务现场进入主循环。</p>
+<p>Codex 则更愿意把外部能力纳入统一工具系统。<code>tools/src/lib.rs</code> 中 MCP resource、dynamic tool、tool discovery 等接口，说明外部扩展最好也成为 schema 化、公理化的工具对象，而不是运行时临时约定。</p>
+<p>这是很关键的分歧。因为一旦生态变大，系统会越来越依赖“扩展能力如何服从总规则”。谁先把边界外移问题想清楚，谁的扩展体系以后就更不容易变成杂物间。</p>
+<h2 id="47-本章结论">4.7 本章结论</h2>
+<p>这一章可以压缩成一句比较硬的判断：</p>
+<blockquote>
+<p>Claude Code 的工具治理更强地依赖运行时编排与现场审批，Codex 的工具治理更强地依赖 schema、参数化权限和独立策略系统。</p>
+</blockquote>
+<p>前者像经验丰富的工头。</p>
+<p>后者像有制度处和法务部的施工单位。</p>
+<p>你要是只看“都能跑命令”，就会错过真正重要的差异。重要的是，谁在工具动手之前拥有最终秩序。</p>
+<p>下一章看更接地气的一层：skills、hooks、本地规则文件和团队制度。技术系统一旦要进团队，最后都得学会写村规民约。</p>
+
+                                
+                                </section>
+<aside class="hb-agentway-cta" aria-label="Continue on AgentWay"><p class="hb-agentway-cta__eyebrow">Continue On AgentWay</p><h3>先注册，再把书里的判断落成练习、路径和项目。</h3><p>如果你已经看清 Claude Code 与 Codex 的分歧，下一步就该选路并动手。AgentWay 会把这些判断接进学习路径、练习和 capstone：先免费注册保留进度，要解锁更深的 track 和专题，再升级高级版。</p><div class="hb-agentway-cta__actions"><a class="hb-agentway-cta__link hb-agentway-cta__link--primary" href="https://agentway.dev/zh/auth">免费注册</a><a class="hb-agentway-cta__link" href="https://agentway.dev/zh/pricing">解锁进阶路径</a></div></aside>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="chapter-03-loop-thread-and-rollout.html" class="navigation navigation-prev " aria-label="Previous page: 第 3 章 心跳放在哪：Query Loop 对照 Thread、Rollout 与 State">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="chapter-05-skills-hooks-and-local-governance.html" class="navigation navigation-next " aria-label="Next page: 第 5 章 技能、Hook 与本地规则：系统如何学会守乡约">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"第 4 章 工具、沙箱与策略语言：谁来阻止模型动手太快","level":"1.8","depth":1,"next":{"title":"第 5 章 技能、Hook 与本地规则：系统如何学会守乡约","level":"1.9","depth":1,"path":"chapter-05-skills-hooks-and-local-governance.md","ref":"chapter-05-skills-hooks-and-local-governance.md","articles":[]},"previous":{"title":"第 3 章 心跳放在哪：Query Loop 对照 Thread、Rollout 与 State","level":"1.7","depth":1,"path":"chapter-03-loop-thread-and-rollout.md","ref":"chapter-03-loop-thread-and-rollout.md","articles":[]},"dir":"ltr"},"config":{"plugins":[],"cover_alt":"封面：Claude Code 和 Codex 的 Harness 设计哲学","root":".","styles":{"website":"styles/website.css","pdf":"styles/pdf.css"},"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"release_date":"2026-04-01","theme":"default","author":"OpenAI Codex","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"outputs":{"print_html":"exported/book2-comparing-print.html","pdf":"exported/book2-comparing.pdf","print_pdf":"exported/book2-comparing-print.pdf","book_pdf":"exported/book2-comparing-book.pdf"},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"cover_image":"assets/cover-wxb.svg","readme_path":"index.md","title_page_lines":["从会用 Agent，到做出 Agent PoC","https://agentway.dev"],"variables":{},"title":"Claude Code 和 Codex 的 Harness 设计哲学","language":"zh-Hans","gitbook":"*","description":"一部比较 Claude Code 与 Codex harness 设计哲学的工程长文。"},"file":{"path":"chapter-04-tools-sandbox-and-exec-policy.md","mtime":"2026-04-02T04:09:21.171Z","type":"markdown"},"gitbook":{"version":"6.1.7","time":"2026-04-02T04:11:45.066Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <noscript>
+        <style>
+            .honkit-cloak {
+                display: block !important;
+            }
+        </style>
+    </noscript>
+    <script>
+        // Restore sidebar state as critical path for prevent layout shift
+        function __init__getSidebarState(defaultValue){
+            var baseKey = "";
+            var key = baseKey + ":sidebar";
+            try {
+                var value = localStorage[key];
+                if (value === undefined) {
+                    return defaultValue;
+                }
+                var parsed = JSON.parse(value);
+                return parsed == null ? defaultValue : parsed;
+            } catch (e) {
+                return defaultValue;
+            }
+        }
+        function __init__restoreLastSidebarState() {
+            var isMobile = window.matchMedia("(max-width: 600px)").matches;
+            if (isMobile) {
+                // Init last state if not mobile
+                return;
+            }
+            var sidebarState = __init__getSidebarState(true);
+            var book = document.querySelector(".book");
+            // Show sidebar if it enabled
+            if (sidebarState && book) {
+                book.classList.add("without-animation", "with-summary");
+            }
+        }
+
+        try {
+            __init__restoreLastSidebarState();
+        } finally {
+            var book = document.querySelector(".book");
+            book.classList.remove("honkit-cloak");
+        }
+    </script>
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/@honkit/honkit-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

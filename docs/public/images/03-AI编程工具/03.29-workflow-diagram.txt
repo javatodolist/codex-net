@@ -1,0 +1,6 @@
+# 创建工作流程图的占位符
+# 实际图片将通过截图或设计工具生成
+Builder.io 工作流整合图
+- PM: Slack/Jira -> Builder -> 可部署实验
+- Designer: Figma -> Builder -> 生产代码
+- Developer: 架构需求 -> Builder -> 脚手架代码

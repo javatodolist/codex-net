@@ -1,0 +1,36 @@
+digraph SprintFlow {
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=11];
+    edge [fontname="PingFang SC", fontsize=9];
+    graph [fontname="PingFang SC", fontsize=14];
+    nodesep=0.6;
+    ranksep=0.7;
+
+    epics [label="epics-and-stories.md\n（规划阶段产物）", fillcolor="#C8E6C9", color="#2E7D32", penwidth=2, shape=note];
+
+    sprint_plan [label="sprint-planning\n生成 sprint-status.yaml", fillcolor="#BBDEFB", color="#1565C0", penwidth=2];
+
+    subgraph cluster_yaml {
+        label="sprint-status.yaml 结构";
+        style=filled; fillcolor="#E3F2FD"; color="#1565C0"; penwidth=2;
+        fontname="PingFang SC";
+
+        s1 [label="Story 1-1\nstatus: ready-for-dev", fillcolor="#A5D6A7", color="#2E7D32"];
+        s2 [label="Story 1-2\nstatus: pending", fillcolor="#FFE0B2", color="#E65100"];
+        s3 [label="Story 2-1\nstatus: pending", fillcolor="#FFE0B2", color="#E65100"];
+        s4 [label="Story 2-2\nstatus: pending", fillcolor="#FFE0B2", color="#E65100"];
+        dots [label="... 更多 stories", fillcolor="#ECEFF1", color="#546E7A"];
+    }
+
+    create_story [label="create-story\n自动找第一个 ready-for-dev", fillcolor="#C8E6C9", color="#2E7D32", penwidth=2];
+    story_file [label="story-1-1-user-register.md\n（包含完整上下文）", fillcolor="#FFF9C4", color="#F57F17", penwidth=2, shape=note];
+
+    epics -> sprint_plan [label="/bmad-sprint-planning"];
+    sprint_plan -> s1;
+    sprint_plan -> s2;
+    sprint_plan -> s3;
+    sprint_plan -> s4;
+    sprint_plan -> dots;
+    s1 -> create_story [label="第一个可执行 story"];
+    create_story -> story_file [label="生成带上下文的 story 文件"];
+}

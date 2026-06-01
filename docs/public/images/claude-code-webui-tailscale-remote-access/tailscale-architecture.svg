@@ -1,0 +1,74 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- 定义样式 -->
+  <defs>
+    <style>
+      .device-box { fill: #ffffff; stroke: #3B82F6; stroke-width: 3; rx: 8; }
+      .network-cloud { fill: #EFF6FF; stroke: #3B82F6; stroke-width: 3; stroke-dasharray: 5,5; }
+      .connection-line { stroke: #10B981; stroke-width: 3; fill: none; }
+      .relay-line { stroke: #F59E0B; stroke-width: 3; fill: none; stroke-dasharray: 10,5; }
+      .label-text { font-family: Arial, sans-serif; font-size: 16px; fill: #1F2937; }
+      .ip-text { font-family: 'Courier New', monospace; font-size: 14px; fill: #3B82F6; }
+      .title-text { font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; fill: #1F2937; }
+      .icon-text { font-size: 40px; }
+    </style>
+  </defs>
+
+  <!-- 标题 -->
+  <text x="600" y="40" text-anchor="middle" class="title-text">Tailscale 网络架构</text>
+
+  <!-- Mac 电脑 -->
+  <rect x="100" y="300" width="240" height="180" class="device-box"/>
+  <text x="220" y="360" text-anchor="middle" class="icon-text">💻</text>
+  <text x="220" y="400" text-anchor="middle" class="label-text">Mac mini</text>
+  <text x="220" y="425" text-anchor="middle" class="label-text">stinglongdeMac-mini</text>
+  <text x="220" y="450" text-anchor="middle" class="ip-text">100.115.188.59</text>
+  <text x="220" y="470" text-anchor="middle" class="ip-text">(Tailscale IP)</text>
+
+  <!-- iPhone -->
+  <rect x="860" y="300" width="240" height="180" class="device-box"/>
+  <text x="980" y="360" text-anchor="middle" class="icon-text">📱</text>
+  <text x="980" y="400" text-anchor="middle" class="label-text">iPhone 12</text>
+  <text x="980" y="425" text-anchor="middle" class="label-text">手机客户端</text>
+  <text x="980" y="450" text-anchor="middle" class="ip-text">100.122.42.111</text>
+  <text x="980" y="470" text-anchor="middle" class="ip-text">(Tailscale IP)</text>
+
+  <!-- Tailscale 云网络 -->
+  <ellipse cx="600" cy="150" rx="280" ry="100" class="network-cloud"/>
+  <text x="600" y="140" text-anchor="middle" class="label-text" font-size="18px" font-weight="bold">Tailscale 虚拟网络</text>
+  <text x="600" y="165" text-anchor="middle" class="label-text" font-size="14px">WireGuard 加密隧道</text>
+
+  <!-- 连接线：Mac -> Tailscale -->
+  <path d="M 220 300 L 220 250 Q 220 200 280 180" class="connection-line"/>
+  <text x="250" y="240" class="label-text" font-size="13px">✅ 直连</text>
+
+  <!-- 连接线：iPhone -> Tailscale -->
+  <path d="M 980 300 L 980 250 Q 980 200 920 180" class="connection-line"/>
+  <text x="920" y="240" class="label-text" font-size="13px">✅ 直连</text>
+
+  <!-- 端到端连接（理想状态） -->
+  <path d="M 340 390 L 860 390" class="connection-line"/>
+  <text x="600" y="380" text-anchor="middle" class="label-text" font-size="14px" fill="#10B981">理想状态：端到端加密直连</text>
+
+  <!-- 中继服务器（备选） -->
+  <rect x="500" y="550" width="200" height="100" class="device-box" fill="#FEF3C7"/>
+  <text x="600" y="590" text-anchor="middle" class="icon-text">🌏</text>
+  <text x="600" y="625" text-anchor="middle" class="label-text">中继服务器 (HKG)</text>
+
+  <!-- 中继连接线 -->
+  <path d="M 220 480 L 220 520 L 500 600" class="relay-line"/>
+  <path d="M 980 480 L 980 520 L 700 600" class="relay-line"/>
+  <text x="350" y="540" class="label-text" font-size="13px" fill="#F59E0B">⚠️ NAT 穿透失败时使用中继</text>
+
+  <!-- 说明框 -->
+  <rect x="50" y="680" width="500" height="100" fill="#F0F9FF" stroke="#3B82F6" stroke-width="2" rx="8"/>
+  <text x="70" y="710" class="label-text" font-size="14px" font-weight="bold">特点：</text>
+  <text x="70" y="735" class="label-text" font-size="13px">• 端到端加密（WireGuard 协议）</text>
+  <text x="70" y="755" class="label-text" font-size="13px">• 自动 NAT 穿透，穿透失败自动降级中继</text>
+  <text x="70" y="775" class="label-text" font-size="13px">• 虚拟局域网，全球任何地方都能访问</text>
+
+  <rect x="650" y="680" width="500" height="100" fill="#ECFDF5" stroke="#10B981" stroke-width="2" rx="8"/>
+  <text x="670" y="710" class="label-text" font-size="14px" font-weight="bold">访问方式：</text>
+  <text x="670" y="735" class="label-text" font-size="13px">手机浏览器访问：http://100.115.188.59:8080</text>
+  <text x="670" y="755" class="label-text" font-size="13px">Mac 本地访问：http://localhost:8080</text>
+  <text x="670" y="775" class="label-text" font-size="13px">✅ 支持全球随时随地访问</text>
+</svg>

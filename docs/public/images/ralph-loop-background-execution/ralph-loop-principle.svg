@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1000">
+  <title>Ralph Loop 自我迭代工作原理</title>
+  <desc>展示 Ralph Loop 如何通过自我修复和自我迭代完成任务</desc>
+
+  <defs>
+    <!-- 箭头标记 -->
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3B82F6"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#EF4444"/>
+    </marker>
+    <marker id="arrowYellow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#F59E0B"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#10B981"/>
+    </marker>
+
+    <!-- 阴影滤镜 -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1200" height="1000" fill="#FFFFFF"/>
+
+  <!-- 标题 -->
+  <text x="600" y="40" font-family="Inter, SF Pro Display, system-ui, sans-serif"
+        font-size="28" font-weight="700" fill="#1E293B" text-anchor="middle">
+    Ralph Loop 自我迭代工作原理
+  </text>
+
+  <!-- 开始节点 -->
+  <ellipse cx="600" cy="120" rx="80" ry="35" fill="#E0F2FE" stroke="#3B82F6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="600" y="128" font-family="Inter, system-ui, sans-serif" font-size="16" fill="#1E293B" text-anchor="middle">用户提交任务</text>
+
+  <!-- 箭头1: 开始 -> Claude读取 -->
+  <line x1="600" y1="155" x2="600" y2="200" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- 步骤1: Claude读取任务 -->
+  <rect x="500" y="200" width="200" height="60" rx="12" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="600" y="235" font-family="Inter, system-ui, sans-serif" font-size="15" fill="#1E293B" text-anchor="middle">Claude 读取任务描述</text>
+
+  <!-- 箭头2 -->
+  <line x1="600" y1="260" x2="600" y2="300" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- 步骤2: 分析状态 (自我迭代起点) -->
+  <rect x="500" y="300" width="200" height="60" rx="12" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="600" y="335" font-family="Inter, system-ui, sans-serif" font-size="15" fill="#1E293B" text-anchor="middle">分析当前状态和目标</text>
+
+  <!-- 自我迭代标注 -->
+  <text x="770" y="335" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#F59E0B">
+    ← 自我迭代循环
+  </text>
+
+  <!-- 箭头3 -->
+  <line x1="600" y1="360" x2="600" y2="410" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- 步骤3: 编写代码 (自我修复起点) -->
+  <rect x="500" y="410" width="200" height="60" rx="12" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="600" y="445" font-family="Inter, system-ui, sans-serif" font-size="15" fill="#1E293B" text-anchor="middle">编写/修改代码</text>
+
+  <!-- 自我修复标注 -->
+  <text x="770" y="445" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#EF4444">
+    ← 自我修复循环
+  </text>
+
+  <!-- 箭头4 -->
+  <line x1="600" y1="470" x2="600" y2="520" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- 步骤4: 运行测试 -->
+  <rect x="500" y="520" width="200" height="60" rx="12" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="600" y="555" font-family="Inter, system-ui, sans-serif" font-size="15" fill="#1E293B" text-anchor="middle">运行测试</text>
+
+  <!-- 箭头5 -->
+  <line x1="600" y1="580" x2="600" y2="630" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- 决策1: 测试通过? -->
+  <path d="M 600 630 L 680 680 L 600 730 L 520 680 Z" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2" filter="url(#shadow)"/>
+  <text x="600" y="685" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#1E293B" text-anchor="middle">测试通过?</text>
+
+  <!-- 失败路径: 测试失败 -> 分析错误 -> 回到编写代码 -->
+  <path d="M 520 680 Q 350 680 350 440" stroke="#EF4444" stroke-width="3" fill="none" marker-end="url(#arrowRed)" stroke-dasharray="5,5"/>
+  <text x="360" y="560" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#EF4444">失败</text>
+  <rect x="250" y="530" width="100" height="40" rx="8" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="300" y="555" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#1E293B" text-anchor="middle">分析错误原因</text>
+
+  <!-- 成功路径: 向下 -->
+  <line x1="600" y1="730" x2="600" y2="780" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <text x="620" y="760" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#10B981">成功</text>
+
+  <!-- 决策2: 任务完成? -->
+  <path d="M 600 780 L 680 830 L 600 880 L 520 830 Z" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2" filter="url(#shadow)"/>
+  <text x="600" y="835" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#1E293B" text-anchor="middle">任务完成?</text>
+
+  <!-- 未完成路径: 回到分析状态 -->
+  <path d="M 680 830 Q 850 830 850 330 Q 850 330 700 330" stroke="#F59E0B" stroke-width="3" fill="none" marker-end="url(#arrowYellow)" stroke-dasharray="5,5"/>
+  <text x="870" y="580" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#F59E0B">未完成</text>
+
+  <!-- 完成路径: 输出完成标记 -->
+  <line x1="600" y1="880" x2="600" y2="930" stroke="#10B981" stroke-width="3" marker-end="url(#arrowGreen)"/>
+  <text x="620" y="910" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#10B981">完成</text>
+
+  <!-- 结束节点 -->
+  <ellipse cx="600" cy="950" rx="90" ry="35" fill="#D1FAE5" stroke="#10B981" stroke-width="2" filter="url(#shadow)"/>
+  <text x="600" y="958" font-family="Inter, system-ui, sans-serif" font-size="16" fill="#1E293B" text-anchor="middle">输出完成标记</text>
+
+  <!-- 图例 -->
+  <g transform="translate(50, 850)">
+    <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#64748B">循环类型</text>
+
+    <!-- 自我修复 -->
+    <line x1="0" y1="20" x2="40" y2="20" stroke="#EF4444" stroke-width="3" stroke-dasharray="5,5"/>
+    <text x="50" y="25" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#1E293B">自我修复（测试失败循环）</text>
+
+    <!-- 自我迭代 -->
+    <line x1="0" y1="45" x2="40" y2="45" stroke="#F59E0B" stroke-width="3" stroke-dasharray="5,5"/>
+    <text x="50" y="50" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#1E293B">自我迭代（任务未完成循环）</text>
+
+    <!-- 成功完成 -->
+    <line x1="0" y1="70" x2="40" y2="70" stroke="#10B981" stroke-width="3"/>
+    <text x="50" y="75" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#1E293B">成功完成路径</text>
+  </g>
+</svg>

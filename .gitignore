@@ -1,0 +1,22 @@
+node_modules/
+dist/
+docs/.vitepress/cache/
+.vitepress/
+!docs/.vitepress/
+docs/.vitepress/*
+!docs/.vitepress/public/
+docs/.vitepress/public/*
+*.timestamp-*.mjs
+.DS_Store
+*.log
+.npm-cache/
+.idea/
+scripts/deploy.local.conf
+
+# macOS resource forks
+._*
+.claude/scheduled_tasks.lock
+.omx/
+
+# Playwright MCP 临时调试产物（console 日志、页面快照）
+.playwright-mcp/

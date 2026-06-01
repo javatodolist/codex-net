@@ -1,0 +1,1043 @@
+
+<!DOCTYPE HTML>
+<html lang="zh-Hans" >
+    <head>
+        <meta charset="UTF-8">
+        <title>第 7 章 多代理与验证：用分工和验证管理不稳定性 · Harness Engineering：Claude Code 设计指南</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="围绕 Claude Code 的运行时骨架展开，重点讨论控制面、连续性、恢复路径与验证分工。">
+        <meta name="generator" content="HonKit 6.1.7">
+        <meta name="author" content="OpenAI Codex">
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/@honkit/honkit-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/@honkit/honkit-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+        <link rel="stylesheet" href="styles/website.css">
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="chapter-08-team-landing-practices.html" />
+    
+    
+    <link rel="prev" href="chapter-06-errors-and-recovery.html" />
+    
+
+    <style>
+:root {
+  --hb-page-bg: #f7f2e8;
+  --hb-page-bg-soft: #efe8d9;
+  --hb-panel-bg: rgba(252, 248, 239, 0.86);
+  --hb-panel-strong: rgba(247, 241, 230, 0.96);
+  --hb-summary-width: 320px;
+  --hb-nav-bg: rgba(249, 245, 237, 0.82);
+  --hb-nav-border: rgba(53, 41, 27, 0.12);
+  --hb-nav-text: #2d2418;
+  --hb-nav-muted: #756756;
+  --hb-nav-pill: rgba(255, 252, 245, 0.82);
+  --hb-nav-pill-active: #2d2418;
+  --hb-nav-pill-active-text: #f8f4ea;
+  --hb-shadow: 0 20px 46px rgba(53, 41, 27, 0.10);
+  --hb-shadow-soft: 0 10px 24px rgba(53, 41, 27, 0.08);
+}
+
+.book.with-site-switcher {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Noto Serif SC", "Source Han Serif SC", serif;
+  background:
+    radial-gradient(circle at top left, rgba(187, 145, 94, 0.12), transparent 24%),
+    radial-gradient(circle at right 12% top 10%, rgba(135, 89, 50, 0.10), transparent 18%),
+    linear-gradient(180deg, var(--hb-page-bg) 0%, var(--hb-page-bg-soft) 100%);
+}
+
+.book.with-site-switcher .book-summary {
+  left: calc(-1 * var(--hb-summary-width));
+  width: var(--hb-summary-width);
+  background: rgba(242, 235, 223, 0.72);
+  border-right: 1px solid rgba(53, 41, 27, 0.08);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.35);
+}
+
+.book.with-site-switcher.with-summary .book-summary {
+  left: 0;
+}
+
+.book.with-site-switcher .book-summary {
+  padding-top: 76px;
+}
+
+.book.with-site-switcher .book-body {
+  padding-top: 76px;
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .body-inner {
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .page-wrapper {
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner {
+  max-width: 940px;
+  margin: 22px auto 36px;
+  padding: 38px 44px 42px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent 100%),
+    var(--hb-panel-bg);
+  box-shadow: var(--hb-shadow);
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal {
+  color: #33291d;
+  font-size: 17px;
+  line-height: 1.92;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h1,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h2,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h3 {
+  color: #211912;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h1 {
+  margin-top: 0.2em;
+  margin-bottom: 0.7em;
+  font-size: 2.15em;
+  line-height: 1.15;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h2 {
+  margin-top: 1.7em;
+  font-size: 1.5em;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal p,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal li,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal blockquote {
+  max-width: 38em;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal blockquote {
+  margin: 1.5rem 0;
+  padding: 0.2rem 0 0.2rem 1rem;
+  border-left: 3px solid rgba(135, 89, 50, 0.34);
+  color: #5e5245;
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal a {
+  color: #875932;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal code {
+  padding: 0.12em 0.35em;
+  border-radius: 6px;
+  background: rgba(135, 89, 50, 0.09);
+  color: #5c3b22;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal pre {
+  border-radius: 18px;
+  border: 1px solid rgba(53, 41, 27, 0.08);
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.book.with-site-switcher .hb-agentway-cta {
+  margin: 28px 0 6px;
+  padding: 18px 18px 16px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent 100%),
+    rgba(247, 241, 230, 0.86);
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.book.with-site-switcher .hb-agentway-cta__eyebrow {
+  margin: 0 0 8px;
+  color: #875932;
+  font-family: "Avenir Next", "PingFang SC", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.book.with-site-switcher .hb-agentway-cta h3 {
+  margin: 0;
+  color: #1f1812;
+  font-size: 1.26rem;
+  line-height: 1.3;
+}
+
+.book.with-site-switcher .hb-agentway-cta p {
+  margin: 10px 0 0;
+  max-width: none;
+  color: #4f4336;
+}
+
+.book.with-site-switcher .hb-agentway-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.book.with-site-switcher .hb-agentway-cta__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  background: rgba(255, 252, 245, 0.82);
+  color: #2d2418;
+  font-family: "Avenir Next", "PingFang SC", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.book.with-site-switcher .hb-agentway-cta__link--primary {
+  background: #312015;
+  border-color: #312015;
+  color: #f8f4ea;
+}
+
+.book.with-site-switcher #book-search-input {
+  margin: 0 16px 12px;
+  padding: 0;
+  background: transparent;
+}
+
+.book.with-site-switcher #book-search-input input {
+  height: 44px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  border-radius: 999px;
+  background: rgba(255, 252, 245, 0.78);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  color: #3a2e22;
+  font-size: 14px;
+}
+
+.book.with-site-switcher .summary {
+  padding-bottom: 32px;
+}
+
+.book.with-site-switcher .summary li a,
+.book.with-site-switcher .summary li span {
+  color: #5d5042;
+  border-bottom: none;
+}
+
+.book.with-site-switcher .summary li.chapter.active > a,
+.book.with-site-switcher .summary li.active > a {
+  color: #1f1812;
+  font-weight: 700;
+}
+
+.book.with-site-switcher .summary li.chapter {
+  margin: 2px 10px;
+  border-radius: 14px;
+}
+
+.book.with-site-switcher .summary li.chapter > a {
+  border-radius: 14px;
+}
+
+.book.with-site-switcher .summary li.chapter.active > a {
+  background: rgba(255, 252, 245, 0.70);
+}
+
+.book.with-site-switcher .book-header {
+  border-bottom: 1px solid rgba(53, 41, 27, 0.08);
+  background: rgba(249, 244, 235, 0.58);
+}
+
+.hb-site-switcher {
+  position: fixed;
+  top: 10px;
+  left: 14px;
+  right: 14px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--hb-nav-border);
+  border-radius: 22px;
+  background: var(--hb-nav-bg);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.hb-site-switcher__brand {
+  min-width: 0;
+  padding-left: 4px;
+}
+
+.hb-site-switcher__eyebrow {
+  margin: 0 0 2px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hb-nav-muted);
+}
+
+.hb-site-switcher__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--hb-nav-text);
+}
+
+.hb-site-switcher__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+@media screen and (min-width: 600px) {
+  .book.with-site-switcher.with-summary .book-body {
+    left: var(--hb-summary-width);
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .book.with-site-switcher .book-summary {
+    left: calc(-1 * var(--hb-summary-width));
+  }
+
+  .book.with-site-switcher.with-summary .book-summary {
+    left: 0;
+  }
+
+  .book.with-site-switcher.with-summary .book-body {
+    -webkit-transform: translateX(var(--hb-summary-width));
+    -moz-transform: translateX(var(--hb-summary-width));
+    -ms-transform: translateX(var(--hb-summary-width));
+    -o-transform: translateX(var(--hb-summary-width));
+    transform: translateX(var(--hb-summary-width));
+  }
+}
+
+.hb-site-switcher__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--hb-nav-border);
+  border-radius: 999px;
+  background: var(--hb-nav-pill);
+  color: var(--hb-nav-text);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 120ms ease, background-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
+}
+
+.hb-site-switcher__link:hover,
+.hb-site-switcher__link:focus-visible {
+  transform: translateY(-1px);
+  text-decoration: none;
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.hb-site-switcher__link.is-active {
+  background: var(--hb-nav-pill-active);
+  border-color: var(--hb-nav-pill-active);
+  color: var(--hb-nav-pill-active-text);
+}
+
+@media (max-width: 860px) {
+  :root {
+    --hb-summary-width: 290px;
+  }
+
+  .book.with-site-switcher .book-summary,
+  .book.with-site-switcher .book-body {
+    padding-top: 92px;
+  }
+
+  .hb-site-switcher {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    align-items: center;
+    padding: 8px 10px;
+    gap: 10px;
+  }
+
+  .book.with-site-switcher .book-summary {
+    width: var(--hb-summary-width);
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner {
+    margin: 18px 14px 28px;
+    padding: 28px 24px 30px;
+  }
+
+  .hb-site-switcher__links {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+  }
+
+  .hb-site-switcher__link {
+    min-width: fit-content;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --hb-summary-width: min(86vw, 320px);
+  }
+
+  .book.with-site-switcher .book-summary,
+  .book.with-site-switcher .book-body {
+    padding-top: 86px;
+  }
+
+  .book.with-site-switcher .book-summary {
+    width: var(--hb-summary-width);
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner {
+    margin: 12px 8px 20px;
+    padding: 20px 16px 22px;
+    border-radius: 22px;
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner section.normal {
+    font-size: 16px;
+    line-height: 1.82;
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h1 {
+    font-size: 1.75em;
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h2 {
+    font-size: 1.28em;
+  }
+
+  .hb-site-switcher {
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 10px;
+    border-radius: 18px;
+  }
+
+  .hb-site-switcher__brand {
+    width: 100%;
+    padding-left: 0;
+  }
+
+  .hb-site-switcher__eyebrow {
+    display: none;
+  }
+
+  .hb-site-switcher__links {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .hb-site-switcher__links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hb-site-switcher__link {
+    flex: 0 0 auto;
+    min-height: 32px;
+    padding: 0 10px;
+  }
+
+  .hb-site-switcher__title {
+    font-size: 12px;
+  }
+
+  .book.with-site-switcher .hb-agentway-cta {
+    margin-top: 22px;
+    padding: 16px 14px 14px;
+    border-radius: 18px;
+  }
+
+  .book.with-site-switcher .hb-agentway-cta__actions {
+    flex-direction: column;
+  }
+
+  .book.with-site-switcher .hb-agentway-cta__link {
+    width: 100%;
+  }
+}
+</style>
+
+    <link rel="canonical" href="chapter-07-multi-agent-and-verification.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Harness Books">
+    <meta property="og:title" content="第 7 章 多代理与验证：用分工和验证管理不稳定性 · Harness Engineering：Claude Code 设计指南">
+    <meta property="og:description" content="围绕 Claude Code 的运行时骨架展开，重点讨论控制面、连续性、恢复路径与验证分工。">
+    <meta property="og:url" content="https://harness-books.agentway.dev/book1-claude-code/chapter-07-multi-agent-and-verification.html">
+    <meta property="og:image" content="https://harness-books.agentway.dev/og/book1-claude-code/chapter-07-multi-agent-and-verification.svg">
+    <meta property="og:image:alt" content="Harness Engineering：Claude Code 设计指南 封面">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="第 7 章 多代理与验证：用分工和验证管理不稳定性 · Harness Engineering：Claude Code 设计指南">
+    <meta name="twitter:description" content="围绕 Claude Code 的运行时骨架展开，重点讨论控制面、连续性、恢复路径与验证分工。">
+    <meta name="twitter:image" content="https://harness-books.agentway.dev/og/book1-claude-code/chapter-07-multi-agent-and-verification.svg">
+    <meta name="twitter:image:alt" content="Harness Engineering：Claude Code 设计指南 封面">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "第 7 章 多代理与验证：用分工和验证管理不稳定性 · Harness Engineering：Claude Code 设计指南", "description": "围绕 Claude Code 的运行时骨架展开，重点讨论控制面、连续性、恢复路径与验证分工。", "url": "https://harness-books.agentway.dev/book1-claude-code/chapter-07-multi-agent-and-verification.html", "image": "https://harness-books.agentway.dev/og/book1-claude-code/chapter-07-multi-agent-and-verification.svg", "isPartOf": {"@type": "Book", "name": "Harness Engineering：Claude Code 设计指南", "url": "https://harness-books.agentway.dev/book1-claude-code/"}, "author": {"@type": "Organization", "name": "AgentWay", "url": "https://agentway.dev"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Book", "name": "Harness Engineering：Claude Code 设计指南", "url": "https://harness-books.agentway.dev/book1-claude-code/", "description": "一部从 Claude Code 源码抽象 AI 编程系统工程原则的中文书稿。", "author": {"@type": "Organization", "name": "AgentWay", "url": "https://agentway.dev"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Harness Books", "item": "https://harness-books.agentway.dev/"}, {"@type": "ListItem", "position": 2, "name": "Harness Engineering：Claude Code 设计指南", "item": "https://harness-books.agentway.dev/book1-claude-code/"}, {"@type": "ListItem", "position": 3, "name": "第 7 章 多代理与验证：用分工和验证管理不稳定性", "item": "https://harness-books.agentway.dev/book1-claude-code/chapter-07-multi-agent-and-verification.html"}]}</script>
+</head>
+    <body>
+<div class="hb-site-switcher" role="navigation" aria-label="Book switcher"><div class="hb-site-switcher__brand"><p class="hb-site-switcher__eyebrow">Harness Books</p><p class="hb-site-switcher__title">Harness Engineering：Claude Code 设计指南</p></div><div class="hb-site-switcher__links"><a class="hb-site-switcher__link" href="https://harness-books.agentway.dev/index.html">首页</a><a class="hb-site-switcher__link is-active" href="index.html">Harness Engineering：Claude Code 设计指南</a><a class="hb-site-switcher__link" href="https://harness-books.agentway.dev/book2-comparing/">Claude Code 和 Codex 的 Harness 设计哲学</a><a class="hb-site-switcher__link" href="exported/book1-claude-code.pdf" download>下载 PDF</a></div></div>
+        
+<div class="book honkit-cloak with-site-switcher">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="輸入並搜尋" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="index.html">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="./">
+            
+                <a href="index.html">
+            
+                    
+                    导读
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="preface.html">
+            
+                <a href="preface.html">
+            
+                    
+                    序言 Harness、终端与工程约束
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="chapter-01-why-harness-engineering.html">
+            
+                <a href="chapter-01-why-harness-engineering.html">
+            
+                    
+                    第 1 章 为什么需要 Harness Engineering
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="chapter-02-prompt-is-control-plane.html">
+            
+                <a href="chapter-02-prompt-is-control-plane.html">
+            
+                    
+                    第 2 章 Prompt 不是人格，Prompt 是控制平面
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="chapter-03-query-loop-heartbeat.html">
+            
+                <a href="chapter-03-query-loop-heartbeat.html">
+            
+                    
+                    第 3 章 Query Loop：代理系统的心跳
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="chapter-04-tools-permissions-interrupts.html">
+            
+                <a href="chapter-04-tools-permissions-interrupts.html">
+            
+                    
+                    第 4 章 工具、权限与中断：为什么代理不能直接碰世界
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8" data-path="chapter-05-context-memory-compact.html">
+            
+                <a href="chapter-05-context-memory-compact.html">
+            
+                    
+                    第 5 章 上下文治理：Memory、CLAUDE.md 与 Compact 是预算制度
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9" data-path="chapter-06-errors-and-recovery.html">
+            
+                <a href="chapter-06-errors-and-recovery.html">
+            
+                    
+                    第 6 章 错误与恢复：出错后仍能继续工作的代理系统
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.10" data-path="chapter-07-multi-agent-and-verification.html">
+            
+                <a href="chapter-07-multi-agent-and-verification.html">
+            
+                    
+                    第 7 章 多代理与验证：用分工和验证管理不稳定性
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.11" data-path="chapter-08-team-landing-practices.html">
+            
+                <a href="chapter-08-team-landing-practices.html">
+            
+                    
+                    第 8 章 团队落地：把一个聪明工具变成可复用制度
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12" data-path="chapter-09-ten-principles.html">
+            
+                <a href="chapter-09-ten-principles.html">
+            
+                    
+                    第 9 章 Harness Engineering 十条原则
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.13" data-path="appendix-a-checklists.html">
+            
+                <a href="appendix-a-checklists.html">
+            
+                    
+                    附录 A 检查清单：把原则落成能执行的约束
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.14" data-path="appendix-b-diagram-notes.html">
+            
+                <a href="appendix-b-diagram-notes.html">
+            
+                    
+                    附录 B 图示：把运行时骨架画出来
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.15" data-path="appendix-c-source-map.html">
+            
+                <a href="appendix-c-source-map.html">
+            
+                    
+                    附录 C 源码地图：本书各章主要依据哪些文件
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://github.com/honkit/honkit" target="blank" class="gitbook-link">
+            本書使用 HonKit 釋出
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="index.html" >第 7 章 多代理与验证：用分工和验证管理不稳定性</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="第-7-章-多代理与验证：用分工和验证管理不稳定性">第 7 章 多代理与验证：用分工和验证管理不稳定性</h1>
+<h2 id="71-单代理走到一定程度，问题就不再是会不会做，而是怎么分工">7.1 单代理走到一定程度，问题就不再是“会不会做”，而是“怎么分工”</h2>
+<p>一个代理如果只在单线程里回答问题，很多矛盾都还能靠耐心遮过去。它慢一点，用户多等会儿；它想得乱一点，多追问几轮；它偶尔把上下文拖成一团，也还可以靠 compact 补救。可一旦任务变大，单代理模型就会碰到一个更难缠的问题：研究、实现、验证都挤在同一条上下文链上，彼此抢预算、抢注意力、抢叙事中心。</p>
+<p>这时候，多代理看上去像一种自然答案。再开几个 worker，不就行了？但事情没这么便宜。多代理并不天然带来秩序，很多时候它只会把单代理的混乱并行复制几份。真正困难的是隔离这些 agent 的不稳定性，同时把结果组织回来。</p>
+<p>Claude Code 的源码在这点上很清醒。它没有把 subagent 当成“另一个会说话的窗口”，而是把它当成一段需要明确缓存边界、状态边界、验证职责和清理责任的受管执行流程。</p>
+<h2 id="72-forked-agent-的第一原则是-cache-safe">7.2 forked agent 的第一原则是 cache-safe</h2>
+<p><code>src/utils/forkedAgent.ts</code> 开头有一段注释，非常能说明 Claude Code 对 subagent 的真实理解。它说 forked agent utility 的职责包括：</p>
+<ol>
+<li>与父代理共享 cache-critical params，确保 prompt cache hit</li>
+<li>跟踪整个 query loop 的 usage</li>
+<li>记录指标</li>
+<li>隔离可变状态，防止干扰主循环</li>
+</ol>
+<p>这四条里，最先出现的是“共享 cache-critical params”。这并非偶然。它说明在 Claude Code 眼里，fork 是运行时层面的受控分叉。既然是分叉，就必须非常在意哪些参数必须和父请求保持一致，否则 prompt cache 共享就失效，成本和延迟会立刻变坏。</p>
+<p><code>CacheSafeParams</code> 里明明白白列了这些要素：</p>
+<ul>
+<li><code>systemPrompt</code></li>
+<li><code>userContext</code></li>
+<li><code>systemContext</code></li>
+<li><code>toolUseContext</code></li>
+<li><code>forkContextMessages</code></li>
+</ul>
+<p>还专门提醒：别随便改 <code>maxOutputTokens</code>，因为 thinking config 也会受影响，而 thinking config 又是 cache key 的一部分。</p>
+<p>这段设计说明，多代理首先是运行时经济学问题。一个子代理如果每次都把父上下文重新烧一遍 token，看上去像在并行提效，实际只是把浪费并行化。Claude Code 在这个环节先处理的是：怎么 fork 才不把缓存打烂。</p>
+<h2 id="73-状态隔离说明，子代理首先要减少污染">7.3 状态隔离说明，子代理首先要减少污染</h2>
+<p>forked agent 的第二个关键，在 <code>createSubagentContext()</code>。源码里对它的默认行为写得很直白：默认情况下，所有 mutable state 都隔离，避免干扰 parent。</p>
+<p>它默认会做这些事：</p>
+<ul>
+<li><code>readFileState</code> 先 clone</li>
+<li><code>abortController</code> 生成 child controller，而不是直接共享</li>
+<li><code>getAppState</code> 做包装，让子代理避免 permission prompt</li>
+<li><code>setAppState</code> 默认 no-op</li>
+<li><code>nestedMemoryAttachmentTriggers</code>、<code>loadedNestedMemoryPaths</code> 等集合都重新建</li>
+</ul>
+<p>只有在明确 opt-in 的情况下，才会共享某些 callback，例如 <code>shareSetAppState</code>、<code>shareSetResponseLength</code>、<code>shareAbortController</code>。</p>
+<p>这套设计特别重要，因为它揭示了一个很多人做多代理时都会忽略的事实：子代理最宝贵的地方，在于它可以避免把自己的局部混乱污染主线程。研究中的误判、临时读到的文件状态、一次性的推理枝杈、正在进行的工具决策，如果全都直接写回主上下文，你得到的只会是更快的脏化。</p>
+<p>Claude Code 在这里的态度是：共享要靠明确同意，隔离才是默认伦理。这种伦理很像数据库事务设计，不像聊天玩具。它不假定“大家都是自己人，状态可以随便串”，而是假定“只要是可变状态，就必须先隔离，再决定共享哪些部分”。</p>
+<h2 id="74-协调者模式说明，synthesis-才是稀缺能力">7.4 协调者模式说明，synthesis 才是稀缺能力</h2>
+<p>如果只看 <code>src/coordinator/coordinatorMode.ts</code>，你会发现 Claude Code 对 coordinator 的要求很有分寸。它明确说 coordinator 的工作包括：</p>
+<ul>
+<li>帮用户达成目标</li>
+<li>指挥 worker 做 research、implementation、verification</li>
+<li>综合结果并和用户沟通</li>
+<li>能直接回答的问题就直接回答，不要滥委派</li>
+</ul>
+<p>最关键的一句，在第 5 节 prompt 里：<strong>Always synthesize</strong>。当 worker 回报研究结果后，协调者必须先读懂，再写出具体 prompt；不要说“based on your findings”，不要把理解继续外包给 worker。</p>
+<p>这句话几乎就是多代理系统的命门。因为真正稀缺的是有人把 worker 带回来的局部知识重新压成清晰、可执行、可验证的下一步。缺少这一层，多代理很快就会退化成一种带着礼貌措辞的任务转发机。每个 agent 都在忙，系统整体却并没有更懂。</p>
+<p>Claude Code 至少在 prompt 设计上很明白这个道理。它要求 research 和 synthesis 分开，要求协调者对研究结果负责，要求 follow-up prompt 里出现具体文件、具体位置、具体变更，而不是抽象地“根据前面的结论”。这是非常正统的工程分工：研究可以分布式，但理解必须重新收束。</p>
+<h2 id="75-验证必须独立成阶段，否则实现完成很快就会冒充问题解决">7.5 验证必须独立成阶段，否则“实现完成”很快就会冒充“问题解决”</h2>
+<p><code>coordinatorMode.ts</code> 还有一段特别值得抄下来。它把常见任务分成：</p>
+<ul>
+<li>Research</li>
+<li>Synthesis</li>
+<li>Implementation</li>
+<li>Verification</li>
+</ul>
+<p>并且专门强调：verification 的目标是证明代码有效，而不只是确认代码存在。源码里甚至写得近乎不留情面：</p>
+<ul>
+<li>run tests with the feature enabled</li>
+<li>investigate errors, don't dismiss as unrelated</li>
+<li>be skeptical</li>
+<li>test independently, don't rubber-stamp</li>
+</ul>
+<p>这段话说明 Claude Code 没把验证当成实现 worker 顺手带一下的附属环节，而是当成第二层质量关。你甚至能在 prompt 里看到“implementation worker 自证一遍，verification worker 再作为第二层 QA”这种明确分层。</p>
+<p>为什么这点这么重要？因为在代理系统里，“我改了代码”和“代码因此正确”之间，隔着一条很宽的河。模型尤其擅长在这条河上搭纸桥。它会给你改动、解释、甚至给你一段像样的测试输出，但这些都不等于功能真的在系统里站住了。</p>
+<p>所以，把 verification 单列出来，是为了防止“会改代码”冒充“能交付结果”。Harness Engineering 在多代理阶段真正需要的，正是这种角色分化。实现的人要尽量专注于改；验证的人要专门怀疑这些改动配不配活着。</p>
+<h2 id="76-hooks-和任务生命周期说明，子代理不是扔出去就算了">7.6 hooks 和任务生命周期说明，子代理不是扔出去就算了</h2>
+<p>多代理系统还有一个很容易被忽略的地方：spawn 只是开头，收尾同样重要。</p>
+<p><code>src/utils/hooks/hooksConfigManager.ts</code> 里定义了 <code>SubagentStart</code> 和 <code>SubagentStop</code> 两类 hook。前者在 subagent 启动时触发，输入里有 <code>agent_id</code> 和 <code>agent_type</code>；后者在 subagent 即将结束时触发，输入里还带 <code>agent_transcript_path</code>，并允许 exit code 2 把 stderr 反馈给 subagent，继续让它跑。</p>
+<p>这说明子代理在 Claude Code 里是显式暴露生命周期节点的系统对象。启动时可以观测，停止前可以介入，转录路径可追踪。这里的重点在于，“子代理结束”也是需要被管理的事件。</p>
+<p>与此同时，<code>src/tasks/LocalAgentTask/LocalAgentTask.tsx</code> 的 <code>registerAsyncAgent()</code> 又展示了另一个层面：每个 async agent 都会注册 cleanup handler，父 abort 可以自动传播给子 abort controller，任务结束后要 evict output、更新状态、解除 cleanup 注册。</p>
+<p>这套机制非常像操作系统，不像聊天面板。它关心的核心问题是：</p>
+<ul>
+<li>这个 agent 是否仍在运行</li>
+<li>父任务死了它是否该跟着死</li>
+<li>它的输出文件是否还要保留</li>
+<li>它的 cleanup callback 有没有泄漏</li>
+</ul>
+<p><img src="diagrams/diag-ch07-01-multi-agent-lifecycle.png" alt="Claude Code Multi-Agent Runtime Lifecycle"></img></p>
+<p>很多多代理 demo 都只做到“我能再起一个 agent”，Claude Code 至少多做了一步：它把 agent 当作会泄漏资源、会残留状态、会在父进程结束后变成孤儿的运行实体来看待。这才像是在把代理当系统组件处理。</p>
+<h2 id="77-验证不仅针对代码，也针对记忆和建议">7.7 验证不仅针对代码，也针对记忆和建议</h2>
+<p>多代理与验证并不只发生在 code change 之后。Claude Code 在 memory 体系里也埋了一条很值得注意的原则。</p>
+<p><code>src/memdir/memoryTypes.ts</code> 里专门提醒：memory records can become stale；在基于 memory 给用户建议之前，要先 verify current state；如果记忆与现状冲突，要相信眼下读到的真实状态，并更新或删除 stale memory。</p>
+<p>这句话放在多代理章节里，恰好能说明一个更一般的事实：验证是整个系统用来抵抗时间漂移和上下文漂移的基本习惯。一个系统如果只验证新写下去的代码，却不验证旧记忆、旧假设、旧索引，那它仍然会被历史信息带偏。</p>
+<p>从这个角度看，verify 既是一项 skill，也是一种组织纪律。你可以把工作分出去，可以把信息存起来，可以让其他 agent 先跑在前面，但在用户准备据此行动之前，总要有人回到当前现实，重新确认这些东西还是真的。</p>
+<h2 id="78-多代理真正解决的是不确定性的分区">7.8 多代理真正解决的是不确定性的分区</h2>
+<p>把这些源码拼起来看，会发现 Claude Code 的多代理设计其实围绕一个朴素目标展开：给不确定性分区。</p>
+<p>研究 worker 可以在局部上下文里探索，不必把所有试探都写回主线程；实现 worker 可以专注修改，不必同时扛着全局沟通负担；验证 worker 可以专门怀疑，不必替自己的实现辩护；coordinator 则留在中间做收束、综合和用户界面。</p>
+<p>这套分区带来的最大好处是职责清晰。职责一清晰，错误就更容易定位：是 research 没找到点子，还是 synthesis 没吃透研究，还是 implementation 写错了，还是 verification 放水了。反过来，如果所有事情都交给一个代理顺手完成，你最后得到的只是一锅浓汤。味道也许不错，出了问题却没法分层修。</p>
+<p>所以，多代理真正有价值的地方，在于把不同种类的不确定性关进不同容器里，再用 coordinator 把它们组织回来。这种做法比单纯追求并发更稳，也更符合工程要求。</p>
+<h2 id="79-从源码里可以提炼出的第七个原则">7.9 从源码里可以提炼出的第七个原则</h2>
+<p>这一章最后可以压成一句话：</p>
+<blockquote>
+<p>多代理依赖清晰分工：研究、实现、验证和综合各自处在不同约束容器里，最后由协调者把结果重新缝合成可交付结果。</p>
+</blockquote>
+<p>Claude Code 的源码在几个地方共同支持这个判断：</p>
+<ul>
+<li><code>forkedAgent.ts</code> 把 cache-safe 参数、usage tracking 与状态隔离放在第一位，说明 fork 首先是运行时控制问题</li>
+<li><code>createSubagentContext()</code> 默认隔离 mutable state，只允许显式 opt-in 共享，说明多代理先防污染再谈协作</li>
+<li><code>coordinatorMode.ts</code> 强调 coordinator 必须 synthesize，而不是转发研究结果，说明综合理解不能外包</li>
+<li>同一个文件把 verification 独立成阶段，并要求独立证明变更有效，说明实现与验证必须角色分离</li>
+<li><code>hooksConfigManager.ts</code> 提供 <code>SubagentStart</code> / <code>SubagentStop</code> 生命周期 hook，说明子代理是可观测对象，不是黑箱线程</li>
+<li><code>LocalAgentTask.tsx</code> 处理 parent abort、cleanup、output eviction，说明 agent 生命周期需要回收机制</li>
+</ul>
+<p>如果把这些提炼成可迁移的工程原则，大概是这样：</p>
+<ul>
+<li>fork 时先考虑 cache 和状态边界，再考虑“人格分工”</li>
+<li>子代理默认应隔离，可共享必须显式声明</li>
+<li>研究可以委派，综合理解不能委派</li>
+<li>验证必须与实现解耦，否则系统会奖励自证正确</li>
+<li>agent 生命周期必须可观测、可中止、可清理</li>
+<li>真正的并行价值在于职责更清楚</li>
+</ul>
+<p>下一章要讨论的，是当这一整套机制落到团队里时，如何从个人技巧变成组织制度。也就是说，<code>CLAUDE.md</code>、skills、approval、hook、memory 这些东西，怎样从“某个高手自己会用”变成“一个团队可以稳定复用”的工程实践。</p>
+
+                                
+                                </section>
+<aside class="hb-agentway-cta" aria-label="Continue on AgentWay"><p class="hb-agentway-cta__eyebrow">Continue On AgentWay</p><h3>先注册，再把书里的判断落成练习、路径和项目。</h3><p>这些书帮你看清 Harness 的骨架。AgentWay 负责把它接成可执行学习路径：先免费注册，拿到基础 track 与进度记录；准备动手做练习、flashcards、capstone 和进阶专题时，再升级高级版。</p><div class="hb-agentway-cta__actions"><a class="hb-agentway-cta__link hb-agentway-cta__link--primary" href="https://agentway.dev/zh/auth">免费注册</a><a class="hb-agentway-cta__link" href="https://agentway.dev/zh/pricing">解锁进阶路径</a></div></aside>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="chapter-06-errors-and-recovery.html" class="navigation navigation-prev " aria-label="Previous page: 第 6 章 错误与恢复：出错后仍能继续工作的代理系统">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="chapter-08-team-landing-practices.html" class="navigation navigation-next " aria-label="Next page: 第 8 章 团队落地：把一个聪明工具变成可复用制度">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"第 7 章 多代理与验证：用分工和验证管理不稳定性","level":"1.10","depth":1,"next":{"title":"第 8 章 团队落地：把一个聪明工具变成可复用制度","level":"1.11","depth":1,"path":"chapter-08-team-landing-practices.md","ref":"chapter-08-team-landing-practices.md","articles":[]},"previous":{"title":"第 6 章 错误与恢复：出错后仍能继续工作的代理系统","level":"1.9","depth":1,"path":"chapter-06-errors-and-recovery.md","ref":"chapter-06-errors-and-recovery.md","articles":[]},"dir":"ltr"},"config":{"plugins":[],"cover_alt":"封面：Harness Engineering：Claude Code 设计指南","root":".","styles":{"website":"styles/website.css","pdf":"styles/pdf.css"},"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"release_date":"2026-04-01","theme":"default","author":"OpenAI Codex","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"outputs":{"print_html":"exported/book1-claude-code-print.html","pdf":"exported/book1-claude-code.pdf","print_pdf":"exported/book1-claude-code-print.pdf","book_pdf":"exported/book1-claude-code-book.pdf"},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"cover_image":"assets/cover-wxb.svg","readme_path":"index.md","title_page_lines":["从会用 Agent，到做出 Agent PoC","https://agentway.dev"],"variables":{},"title":"Harness Engineering：Claude Code 设计指南","language":"zh-Hans","gitbook":"*","description":"一部从 Claude Code 源码抽象 AI 编程系统工程原则的中文书稿。"},"file":{"path":"chapter-07-multi-agent-and-verification.md","mtime":"2026-04-02T04:09:21.164Z","type":"markdown"},"gitbook":{"version":"6.1.7","time":"2026-04-02T04:11:42.555Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <noscript>
+        <style>
+            .honkit-cloak {
+                display: block !important;
+            }
+        </style>
+    </noscript>
+    <script>
+        // Restore sidebar state as critical path for prevent layout shift
+        function __init__getSidebarState(defaultValue){
+            var baseKey = "";
+            var key = baseKey + ":sidebar";
+            try {
+                var value = localStorage[key];
+                if (value === undefined) {
+                    return defaultValue;
+                }
+                var parsed = JSON.parse(value);
+                return parsed == null ? defaultValue : parsed;
+            } catch (e) {
+                return defaultValue;
+            }
+        }
+        function __init__restoreLastSidebarState() {
+            var isMobile = window.matchMedia("(max-width: 600px)").matches;
+            if (isMobile) {
+                // Init last state if not mobile
+                return;
+            }
+            var sidebarState = __init__getSidebarState(true);
+            var book = document.querySelector(".book");
+            // Show sidebar if it enabled
+            if (sidebarState && book) {
+                book.classList.add("without-animation", "with-summary");
+            }
+        }
+
+        try {
+            __init__restoreLastSidebarState();
+        } finally {
+            var book = document.querySelector(".book");
+            book.classList.remove("honkit-cloak");
+        }
+    </script>
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/@honkit/honkit-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

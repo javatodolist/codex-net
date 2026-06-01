@@ -1,0 +1,81 @@
+/* 三栏布局微调 - VitePress 默认已提供左侧边栏 + 内容 + 右侧 outline */
+
+.VPDoc {
+  padding-bottom: 48px;
+}
+
+/* 确保内容区域有足够空间 */
+.VPDoc .container {
+  max-width: 100%;
+}
+
+/* 博客文章页：原生 TOC 已并入 sidebar tabs 目录标签，隐藏原生 outline */
+.blog-sidebar-aside ~ .VPDocAsideOutline,
+.VPDocAside:has(.blog-sidebar-aside) .VPDocAsideOutline {
+  display: none;
+}
+
+/* 工具栏切换：隐藏右侧 outline */
+html.hide-aside .VPDocAsideOutline,
+html.hide-aside .VPDocAside {
+  display: none !important;
+}
+
+/* aside-top 注入的侧边栏容器 */
+.blog-sidebar-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.blog-sidebar-aside::-webkit-scrollbar {
+  display: none;
+}
+
+/* 博客文章页宽屏：扩展容器以减少右侧空白 */
+@media (min-width: 1280px) {
+  .VPDoc:has(.blog-sidebar-aside) .aside {
+    max-width: 320px;
+  }
+
+  .VPDoc:has(.blog-sidebar-aside) .aside-container,
+  .VPDoc:has(.blog-sidebar-aside) .aside-curtain {
+    width: 300px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .VPDoc:has(.blog-sidebar-aside) .container {
+    max-width: calc(100vw - 160px) !important;
+  }
+
+  /* content 填满 aside 剩余空间，消除右侧间隙 */
+  .VPDoc:has(.blog-sidebar-aside):not(.has-sidebar) .content {
+    flex: 1 1 auto;
+    max-width: none;
+    min-width: 0;
+  }
+
+  /* aside 扩宽以贴近右侧浮动工具栏（工具栏 40px + margin 16px + gap 8px = 64px） */
+  /* aside-container 是 position:sticky，不能用 width:100%（会相对 scroll container 计算） */
+  .VPDoc:has(.blog-sidebar-aside) .aside {
+    max-width: min(calc(100vw - var(--vp-sidebar-width, 272px) - 700px - 64px), 420px);
+  }
+
+  .VPDoc:has(.blog-sidebar-aside) .aside-container,
+  .VPDoc:has(.blog-sidebar-aside) .aside-curtain {
+    width: min(calc(100vw - var(--vp-sidebar-width, 272px) - 700px - 84px), 400px);
+  }
+}
+
+/* 工具栏切换：隐藏左侧边栏 */
+html.hide-sidebar .VPSidebar {
+  display: none !important;
+}
+html.hide-sidebar .VPContent.has-sidebar {
+  padding-left: 0 !important;
+}

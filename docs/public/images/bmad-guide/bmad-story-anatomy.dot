@@ -1,0 +1,49 @@
+digraph StoryAnatomy {
+    rankdir=LR;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=11];
+    edge [fontname="PingFang SC", fontsize=9];
+    graph [fontname="PingFang SC", fontsize=14];
+    nodesep=0.5;
+    ranksep=1.2;
+
+    story [label="story-1-1.md", fillcolor="#FFF9C4", color="#F57F17", penwidth=2, shape=note, fontsize=13];
+
+    subgraph cluster_meta {
+        label="基础信息";
+        style=filled; fillcolor="#E3F2FD"; color="#1565C0"; penwidth=2;
+        fontname="PingFang SC";
+        m1 [label="Epic / Story 编号", fillcolor="#BBDEFB"];
+        m2 [label="优先级 / 预估工时", fillcolor="#BBDEFB"];
+        m3 [label="依赖的前置 story", fillcolor="#BBDEFB"];
+    }
+
+    subgraph cluster_req {
+        label="需求上下文（来自 PRD）";
+        style=filled; fillcolor="#E8F5E9"; color="#2E7D32"; penwidth=2;
+        fontname="PingFang SC";
+        r1 [label="用户故事\nAs a / I want / So that", fillcolor="#C8E6C9"];
+        r2 [label="验收标准 AC1-AC6", fillcolor="#A5D6A7"];
+    }
+
+    subgraph cluster_tech {
+        label="技术上下文（来自架构文档）";
+        style=filled; fillcolor="#FFF3E0"; color="#E65100"; penwidth=2;
+        fontname="PingFang SC";
+        t1 [label="相关 API 端点", fillcolor="#FFE0B2"];
+        t2 [label="数据库表和字段", fillcolor="#FFE0B2"];
+        t3 [label="代码约定提醒", fillcolor="#FFCC80"];
+        t4 [label="需要修改的文件路径", fillcolor="#FFCC80"];
+    }
+
+    subgraph cluster_tasks {
+        label="实现任务分解（Dev Agent 执行）";
+        style=filled; fillcolor="#EDE7F6"; color="#6A1B9A"; penwidth=2;
+        fontname="PingFang SC";
+        k1 [label="□ Task 1：创建 users 表迁移文件", fillcolor="#D1C4E9"];
+        k2 [label="□ Task 2：实现注册 handler", fillcolor="#D1C4E9"];
+        k3 [label="□ Task 3：实现验证码发送服务", fillcolor="#D1C4E9"];
+        k4 [label="□ Task 4：写单元测试", fillcolor="#B39DDB"];
+    }
+
+    story -> m1; story -> r1; story -> t1; story -> k1;
+}

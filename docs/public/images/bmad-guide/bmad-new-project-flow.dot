@@ -1,0 +1,51 @@
+digraph NewProjectFlow {
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=11];
+    edge [fontname="PingFang SC", fontsize=9];
+    graph [fontname="PingFang SC", fontsize=14];
+    nodesep=0.5;
+    ranksep=0.6;
+
+    start [label="新项目启动", shape=ellipse, fillcolor="#FFF9C4", color="#F57F17", penwidth=2];
+
+    subgraph cluster_p1 {
+        label="Part 1  安装配置";
+        style=filled; fillcolor="#ECEFF1"; color="#546E7A"; penwidth=2;
+        fontname="PingFang SC";
+        s1 [label="npx bmad-method install", fillcolor="#CFD8DC"];
+    }
+
+    subgraph cluster_p2 {
+        label="Part 2  想法到规划";
+        style=filled; fillcolor="#FFF3E0"; color="#E65100"; penwidth=2;
+        fontname="PingFang SC";
+        s2 [label="/bmad-brainstorming\n发散想法", fillcolor="#FFE0B2"];
+        s3 [label="/bmad-create-product-brief\n产品简报", fillcolor="#FFE0B2"];
+        s4 [label="/bmad-technical-research\n技术选型", fillcolor="#FFE0B2"];
+        s5 [label="/bmad-create-prd\n产品需求文档", fillcolor="#FFCC80"];
+        s6 [label="/bmad-validate-prd\n验证 PRD", fillcolor="#FFB74D"];
+    }
+
+    subgraph cluster_p3 {
+        label="Part 3  技术方案";
+        style=filled; fillcolor="#E8F5E9"; color="#2E7D32"; penwidth=2;
+        fontname="PingFang SC";
+        s7 [label="/bmad-create-architecture\n技术架构", fillcolor="#C8E6C9"];
+        s8 [label="/bmad-create-epics-and-stories\n拆解任务", fillcolor="#C8E6C9"];
+        s9 [label="/bmad-check-implementation-readiness\n就绪检查", fillcolor="#A5D6A7"];
+    }
+
+    subgraph cluster_p4 {
+        label="Part 4  开发执行";
+        style=filled; fillcolor="#E3F2FD"; color="#0D47A1"; penwidth=2;
+        fontname="PingFang SC";
+        s10 [label="/bmad-sprint-planning\nSprint 计划", fillcolor="#BBDEFB"];
+        s11 [label="create-story → dev-story → code-review\n核心开发循环", fillcolor="#90CAF9"];
+    }
+
+    start -> s1 -> s2 -> s3 -> s4 -> s5 -> s6 -> s7 -> s8 -> s9 -> s10 -> s11;
+
+    // 反馈循环
+    s6 -> s5 [label="修复后重验证", style=dashed, color="#E53935", constraint=false];
+    s9 -> s7 [label="补充文档", style=dashed, color="#E53935", constraint=false];
+}

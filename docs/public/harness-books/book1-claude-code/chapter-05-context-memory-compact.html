@@ -1,0 +1,1033 @@
+
+<!DOCTYPE HTML>
+<html lang="zh-Hans" >
+    <head>
+        <meta charset="UTF-8">
+        <title>第 5 章 上下文治理：Memory、CLAUDE.md 与 Compact 是预算制度 · Harness Engineering：Claude Code 设计指南</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="围绕 Claude Code 的运行时骨架展开，重点讨论控制面、连续性、恢复路径与验证分工。">
+        <meta name="generator" content="HonKit 6.1.7">
+        <meta name="author" content="OpenAI Codex">
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/@honkit/honkit-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/@honkit/honkit-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+        <link rel="stylesheet" href="styles/website.css">
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="chapter-06-errors-and-recovery.html" />
+    
+    
+    <link rel="prev" href="chapter-04-tools-permissions-interrupts.html" />
+    
+
+    <style>
+:root {
+  --hb-page-bg: #f7f2e8;
+  --hb-page-bg-soft: #efe8d9;
+  --hb-panel-bg: rgba(252, 248, 239, 0.86);
+  --hb-panel-strong: rgba(247, 241, 230, 0.96);
+  --hb-summary-width: 320px;
+  --hb-nav-bg: rgba(249, 245, 237, 0.82);
+  --hb-nav-border: rgba(53, 41, 27, 0.12);
+  --hb-nav-text: #2d2418;
+  --hb-nav-muted: #756756;
+  --hb-nav-pill: rgba(255, 252, 245, 0.82);
+  --hb-nav-pill-active: #2d2418;
+  --hb-nav-pill-active-text: #f8f4ea;
+  --hb-shadow: 0 20px 46px rgba(53, 41, 27, 0.10);
+  --hb-shadow-soft: 0 10px 24px rgba(53, 41, 27, 0.08);
+}
+
+.book.with-site-switcher {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Noto Serif SC", "Source Han Serif SC", serif;
+  background:
+    radial-gradient(circle at top left, rgba(187, 145, 94, 0.12), transparent 24%),
+    radial-gradient(circle at right 12% top 10%, rgba(135, 89, 50, 0.10), transparent 18%),
+    linear-gradient(180deg, var(--hb-page-bg) 0%, var(--hb-page-bg-soft) 100%);
+}
+
+.book.with-site-switcher .book-summary {
+  left: calc(-1 * var(--hb-summary-width));
+  width: var(--hb-summary-width);
+  background: rgba(242, 235, 223, 0.72);
+  border-right: 1px solid rgba(53, 41, 27, 0.08);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.35);
+}
+
+.book.with-site-switcher.with-summary .book-summary {
+  left: 0;
+}
+
+.book.with-site-switcher .book-summary {
+  padding-top: 76px;
+}
+
+.book.with-site-switcher .book-body {
+  padding-top: 76px;
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .body-inner {
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .page-wrapper {
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner {
+  max-width: 940px;
+  margin: 22px auto 36px;
+  padding: 38px 44px 42px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent 100%),
+    var(--hb-panel-bg);
+  box-shadow: var(--hb-shadow);
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal {
+  color: #33291d;
+  font-size: 17px;
+  line-height: 1.92;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h1,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h2,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h3 {
+  color: #211912;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h1 {
+  margin-top: 0.2em;
+  margin-bottom: 0.7em;
+  font-size: 2.15em;
+  line-height: 1.15;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h2 {
+  margin-top: 1.7em;
+  font-size: 1.5em;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal p,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal li,
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal blockquote {
+  max-width: 38em;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal blockquote {
+  margin: 1.5rem 0;
+  padding: 0.2rem 0 0.2rem 1rem;
+  border-left: 3px solid rgba(135, 89, 50, 0.34);
+  color: #5e5245;
+  background: transparent;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal a {
+  color: #875932;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal code {
+  padding: 0.12em 0.35em;
+  border-radius: 6px;
+  background: rgba(135, 89, 50, 0.09);
+  color: #5c3b22;
+}
+
+.book.with-site-switcher .book-body .page-wrapper .page-inner section.normal pre {
+  border-radius: 18px;
+  border: 1px solid rgba(53, 41, 27, 0.08);
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.book.with-site-switcher .hb-agentway-cta {
+  margin: 28px 0 6px;
+  padding: 18px 18px 16px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent 100%),
+    rgba(247, 241, 230, 0.86);
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.book.with-site-switcher .hb-agentway-cta__eyebrow {
+  margin: 0 0 8px;
+  color: #875932;
+  font-family: "Avenir Next", "PingFang SC", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.book.with-site-switcher .hb-agentway-cta h3 {
+  margin: 0;
+  color: #1f1812;
+  font-size: 1.26rem;
+  line-height: 1.3;
+}
+
+.book.with-site-switcher .hb-agentway-cta p {
+  margin: 10px 0 0;
+  max-width: none;
+  color: #4f4336;
+}
+
+.book.with-site-switcher .hb-agentway-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.book.with-site-switcher .hb-agentway-cta__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  background: rgba(255, 252, 245, 0.82);
+  color: #2d2418;
+  font-family: "Avenir Next", "PingFang SC", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.book.with-site-switcher .hb-agentway-cta__link--primary {
+  background: #312015;
+  border-color: #312015;
+  color: #f8f4ea;
+}
+
+.book.with-site-switcher #book-search-input {
+  margin: 0 16px 12px;
+  padding: 0;
+  background: transparent;
+}
+
+.book.with-site-switcher #book-search-input input {
+  height: 44px;
+  border: 1px solid rgba(53, 41, 27, 0.10);
+  border-radius: 999px;
+  background: rgba(255, 252, 245, 0.78);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  color: #3a2e22;
+  font-size: 14px;
+}
+
+.book.with-site-switcher .summary {
+  padding-bottom: 32px;
+}
+
+.book.with-site-switcher .summary li a,
+.book.with-site-switcher .summary li span {
+  color: #5d5042;
+  border-bottom: none;
+}
+
+.book.with-site-switcher .summary li.chapter.active > a,
+.book.with-site-switcher .summary li.active > a {
+  color: #1f1812;
+  font-weight: 700;
+}
+
+.book.with-site-switcher .summary li.chapter {
+  margin: 2px 10px;
+  border-radius: 14px;
+}
+
+.book.with-site-switcher .summary li.chapter > a {
+  border-radius: 14px;
+}
+
+.book.with-site-switcher .summary li.chapter.active > a {
+  background: rgba(255, 252, 245, 0.70);
+}
+
+.book.with-site-switcher .book-header {
+  border-bottom: 1px solid rgba(53, 41, 27, 0.08);
+  background: rgba(249, 244, 235, 0.58);
+}
+
+.hb-site-switcher {
+  position: fixed;
+  top: 10px;
+  left: 14px;
+  right: 14px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--hb-nav-border);
+  border-radius: 22px;
+  background: var(--hb-nav-bg);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.hb-site-switcher__brand {
+  min-width: 0;
+  padding-left: 4px;
+}
+
+.hb-site-switcher__eyebrow {
+  margin: 0 0 2px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hb-nav-muted);
+}
+
+.hb-site-switcher__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--hb-nav-text);
+}
+
+.hb-site-switcher__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+@media screen and (min-width: 600px) {
+  .book.with-site-switcher.with-summary .book-body {
+    left: var(--hb-summary-width);
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .book.with-site-switcher .book-summary {
+    left: calc(-1 * var(--hb-summary-width));
+  }
+
+  .book.with-site-switcher.with-summary .book-summary {
+    left: 0;
+  }
+
+  .book.with-site-switcher.with-summary .book-body {
+    -webkit-transform: translateX(var(--hb-summary-width));
+    -moz-transform: translateX(var(--hb-summary-width));
+    -ms-transform: translateX(var(--hb-summary-width));
+    -o-transform: translateX(var(--hb-summary-width));
+    transform: translateX(var(--hb-summary-width));
+  }
+}
+
+.hb-site-switcher__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--hb-nav-border);
+  border-radius: 999px;
+  background: var(--hb-nav-pill);
+  color: var(--hb-nav-text);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 120ms ease, background-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
+}
+
+.hb-site-switcher__link:hover,
+.hb-site-switcher__link:focus-visible {
+  transform: translateY(-1px);
+  text-decoration: none;
+  box-shadow: var(--hb-shadow-soft);
+}
+
+.hb-site-switcher__link.is-active {
+  background: var(--hb-nav-pill-active);
+  border-color: var(--hb-nav-pill-active);
+  color: var(--hb-nav-pill-active-text);
+}
+
+@media (max-width: 860px) {
+  :root {
+    --hb-summary-width: 290px;
+  }
+
+  .book.with-site-switcher .book-summary,
+  .book.with-site-switcher .book-body {
+    padding-top: 92px;
+  }
+
+  .hb-site-switcher {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    align-items: center;
+    padding: 8px 10px;
+    gap: 10px;
+  }
+
+  .book.with-site-switcher .book-summary {
+    width: var(--hb-summary-width);
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner {
+    margin: 18px 14px 28px;
+    padding: 28px 24px 30px;
+  }
+
+  .hb-site-switcher__links {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+  }
+
+  .hb-site-switcher__link {
+    min-width: fit-content;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --hb-summary-width: min(86vw, 320px);
+  }
+
+  .book.with-site-switcher .book-summary,
+  .book.with-site-switcher .book-body {
+    padding-top: 86px;
+  }
+
+  .book.with-site-switcher .book-summary {
+    width: var(--hb-summary-width);
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner {
+    margin: 12px 8px 20px;
+    padding: 20px 16px 22px;
+    border-radius: 22px;
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner section.normal {
+    font-size: 16px;
+    line-height: 1.82;
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h1 {
+    font-size: 1.75em;
+  }
+
+  .book.with-site-switcher .book-body .page-wrapper .page-inner section.normal h2 {
+    font-size: 1.28em;
+  }
+
+  .hb-site-switcher {
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 10px;
+    border-radius: 18px;
+  }
+
+  .hb-site-switcher__brand {
+    width: 100%;
+    padding-left: 0;
+  }
+
+  .hb-site-switcher__eyebrow {
+    display: none;
+  }
+
+  .hb-site-switcher__links {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .hb-site-switcher__links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hb-site-switcher__link {
+    flex: 0 0 auto;
+    min-height: 32px;
+    padding: 0 10px;
+  }
+
+  .hb-site-switcher__title {
+    font-size: 12px;
+  }
+
+  .book.with-site-switcher .hb-agentway-cta {
+    margin-top: 22px;
+    padding: 16px 14px 14px;
+    border-radius: 18px;
+  }
+
+  .book.with-site-switcher .hb-agentway-cta__actions {
+    flex-direction: column;
+  }
+
+  .book.with-site-switcher .hb-agentway-cta__link {
+    width: 100%;
+  }
+}
+</style>
+
+    <link rel="canonical" href="chapter-05-context-memory-compact.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Harness Books">
+    <meta property="og:title" content="第 5 章 上下文治理：Memory、CLAUDE.md 与 Compact 是预算制度 · Harness Engineering：Claude Code 设计指南">
+    <meta property="og:description" content="围绕 Claude Code 的运行时骨架展开，重点讨论控制面、连续性、恢复路径与验证分工。">
+    <meta property="og:url" content="https://harness-books.agentway.dev/book1-claude-code/chapter-05-context-memory-compact.html">
+    <meta property="og:image" content="https://harness-books.agentway.dev/og/book1-claude-code/chapter-05-context-memory-compact.svg">
+    <meta property="og:image:alt" content="Harness Engineering：Claude Code 设计指南 封面">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="第 5 章 上下文治理：Memory、CLAUDE.md 与 Compact 是预算制度 · Harness Engineering：Claude Code 设计指南">
+    <meta name="twitter:description" content="围绕 Claude Code 的运行时骨架展开，重点讨论控制面、连续性、恢复路径与验证分工。">
+    <meta name="twitter:image" content="https://harness-books.agentway.dev/og/book1-claude-code/chapter-05-context-memory-compact.svg">
+    <meta name="twitter:image:alt" content="Harness Engineering：Claude Code 设计指南 封面">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "第 5 章 上下文治理：Memory、CLAUDE.md 与 Compact 是预算制度 · Harness Engineering：Claude Code 设计指南", "description": "围绕 Claude Code 的运行时骨架展开，重点讨论控制面、连续性、恢复路径与验证分工。", "url": "https://harness-books.agentway.dev/book1-claude-code/chapter-05-context-memory-compact.html", "image": "https://harness-books.agentway.dev/og/book1-claude-code/chapter-05-context-memory-compact.svg", "isPartOf": {"@type": "Book", "name": "Harness Engineering：Claude Code 设计指南", "url": "https://harness-books.agentway.dev/book1-claude-code/"}, "author": {"@type": "Organization", "name": "AgentWay", "url": "https://agentway.dev"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Book", "name": "Harness Engineering：Claude Code 设计指南", "url": "https://harness-books.agentway.dev/book1-claude-code/", "description": "一部从 Claude Code 源码抽象 AI 编程系统工程原则的中文书稿。", "author": {"@type": "Organization", "name": "AgentWay", "url": "https://agentway.dev"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Harness Books", "item": "https://harness-books.agentway.dev/"}, {"@type": "ListItem", "position": 2, "name": "Harness Engineering：Claude Code 设计指南", "item": "https://harness-books.agentway.dev/book1-claude-code/"}, {"@type": "ListItem", "position": 3, "name": "第 5 章 上下文治理：Memory、CLAUDE.md 与 Compact 是预算制度", "item": "https://harness-books.agentway.dev/book1-claude-code/chapter-05-context-memory-compact.html"}]}</script>
+</head>
+    <body>
+<div class="hb-site-switcher" role="navigation" aria-label="Book switcher"><div class="hb-site-switcher__brand"><p class="hb-site-switcher__eyebrow">Harness Books</p><p class="hb-site-switcher__title">Harness Engineering：Claude Code 设计指南</p></div><div class="hb-site-switcher__links"><a class="hb-site-switcher__link" href="https://harness-books.agentway.dev/index.html">首页</a><a class="hb-site-switcher__link is-active" href="index.html">Harness Engineering：Claude Code 设计指南</a><a class="hb-site-switcher__link" href="https://harness-books.agentway.dev/book2-comparing/">Claude Code 和 Codex 的 Harness 设计哲学</a><a class="hb-site-switcher__link" href="exported/book1-claude-code.pdf" download>下载 PDF</a></div></div>
+        
+<div class="book honkit-cloak with-site-switcher">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="輸入並搜尋" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="index.html">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="./">
+            
+                <a href="index.html">
+            
+                    
+                    导读
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="preface.html">
+            
+                <a href="preface.html">
+            
+                    
+                    序言 Harness、终端与工程约束
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="chapter-01-why-harness-engineering.html">
+            
+                <a href="chapter-01-why-harness-engineering.html">
+            
+                    
+                    第 1 章 为什么需要 Harness Engineering
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="chapter-02-prompt-is-control-plane.html">
+            
+                <a href="chapter-02-prompt-is-control-plane.html">
+            
+                    
+                    第 2 章 Prompt 不是人格，Prompt 是控制平面
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="chapter-03-query-loop-heartbeat.html">
+            
+                <a href="chapter-03-query-loop-heartbeat.html">
+            
+                    
+                    第 3 章 Query Loop：代理系统的心跳
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="chapter-04-tools-permissions-interrupts.html">
+            
+                <a href="chapter-04-tools-permissions-interrupts.html">
+            
+                    
+                    第 4 章 工具、权限与中断：为什么代理不能直接碰世界
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.8" data-path="chapter-05-context-memory-compact.html">
+            
+                <a href="chapter-05-context-memory-compact.html">
+            
+                    
+                    第 5 章 上下文治理：Memory、CLAUDE.md 与 Compact 是预算制度
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9" data-path="chapter-06-errors-and-recovery.html">
+            
+                <a href="chapter-06-errors-and-recovery.html">
+            
+                    
+                    第 6 章 错误与恢复：出错后仍能继续工作的代理系统
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.10" data-path="chapter-07-multi-agent-and-verification.html">
+            
+                <a href="chapter-07-multi-agent-and-verification.html">
+            
+                    
+                    第 7 章 多代理与验证：用分工和验证管理不稳定性
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.11" data-path="chapter-08-team-landing-practices.html">
+            
+                <a href="chapter-08-team-landing-practices.html">
+            
+                    
+                    第 8 章 团队落地：把一个聪明工具变成可复用制度
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12" data-path="chapter-09-ten-principles.html">
+            
+                <a href="chapter-09-ten-principles.html">
+            
+                    
+                    第 9 章 Harness Engineering 十条原则
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.13" data-path="appendix-a-checklists.html">
+            
+                <a href="appendix-a-checklists.html">
+            
+                    
+                    附录 A 检查清单：把原则落成能执行的约束
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.14" data-path="appendix-b-diagram-notes.html">
+            
+                <a href="appendix-b-diagram-notes.html">
+            
+                    
+                    附录 B 图示：把运行时骨架画出来
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.15" data-path="appendix-c-source-map.html">
+            
+                <a href="appendix-c-source-map.html">
+            
+                    
+                    附录 C 源码地图：本书各章主要依据哪些文件
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://github.com/honkit/honkit" target="blank" class="gitbook-link">
+            本書使用 HonKit 釋出
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="index.html" >第 5 章 上下文治理：Memory、CLAUDE.md 与 Compact 是预算制度</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="第-5-章-上下文治理：memory、claudemd-与-compact-是预算制度">第 5 章 上下文治理：Memory、CLAUDE.md 与 Compact 是预算制度</h1>
+<h2 id="51-上下文一多，系统就容易产生一种低级幻觉">5.1 上下文一多，系统就容易产生一种低级幻觉</h2>
+<p>人一旦可以往上下文里不停塞东西，就很容易相信一个朴素的神话：信息越多，系统越聪明。这个神话听起来甚至有点合情合理。毕竟知道得多，总比知道得少强。可惜代理系统不是图书馆，模型也不是藏书管理员。上下文不是一个“存进去就算拥有”的仓库，它首先是一笔昂贵、易膨胀、还会自我污染的预算。</p>
+<p>Claude Code 的源码在这件事上很不浪漫。它并没有把上下文设计成一个可以无限堆叠的记忆池，反而在很多地方反复提醒自己：该加载什么、该截断什么、什么东西要长期保留、什么东西只能短期摘要，都是运行时必须严肃治理的事。</p>
+<p>所以这一章要讨论的是：Claude Code 怎样防止自己被记住的东西拖死。这件事和“记住更多”看起来相近，工程上却是两种制度。前者偏向收藏癖，后者才接近治理术。</p>
+<h2 id="52-claudemd-体系说明，长期指令不能和临场对话混在一起">5.2 <code>CLAUDE.md</code> 体系说明，长期指令不能和临场对话混在一起</h2>
+<p>Claude Code 在 <code>src/utils/claudemd.ts</code> 开头就把记忆层次说得很清楚。它把 instruction source 分成几层：</p>
+<ul>
+<li>managed memory，例如 <code>/etc/claude-code/CLAUDE.md</code></li>
+<li>user memory，例如 <code>~/.claude/CLAUDE.md</code></li>
+<li>project memory，例如项目根目录里的 <code>CLAUDE.md</code>、<code>.claude/CLAUDE.md</code>、<code>.claude/rules/*.md</code></li>
+<li>local memory，例如 <code>CLAUDE.local.md</code></li>
+</ul>
+<p>而且这些文件会按优先级和目录距离加载。离当前工作目录越近的 project 规则，优先级越高；越偏向私有、越偏向本地的规则，越晚加载，因而越靠近模型的注意力前沿。</p>
+<p>这件事特别要紧。因为它说明 Claude Code 从一开始就拒绝把“长期协作规则”和“本轮临时对话”混成一锅粥。团队规范、个人偏好、仓库约束，这些东西的寿命远长于某一轮用户消息；如果把它们全都塞进聊天记录里，系统就会在两个极端之间摇摆：要么每轮都重复注入，浪费上下文；要么靠模型自己回忆，迟早失手。</p>
+<p><code>claudemd.ts</code> 给出的答案，是把这些稳定规则做成可发现、可分层、可组合的持久指令系统。还有个细节很有意思：它支持 <code>@include</code>，并且只允许一大批明确列出的文本扩展名。这说明工程师除了追求 include 的便利，也在提防另一种常见事故：有人把二进制、巨型文档、甚至不该进 prompt 的东西糊里糊涂带进来了。</p>
+<p>这是一种很像正经工程师的克制。系统会先问：“什么东西值得进入系统记忆，什么东西一旦进入就是污染。”</p>
+<h2 id="53-memorymd-是索引，不是日记本">5.3 <code>MEMORY.md</code> 是索引，不是日记本</h2>
+<p>如果 <code>CLAUDE.md</code> 管的是规则层，那么 <code>memdir</code> 处理的就是另一类更细的长期记忆。<code>src/memdir/memdir.ts</code> 里有一段设计很值得反复看：<code>ENTRYPOINT_NAME</code> 被定义成 <code>MEMORY.md</code>，但这个文件并不被鼓励用来直接堆内容，它被定义为 index。</p>
+<p>源码里写得很实在。<code>buildMemoryLines()</code> 明确告诉模型，保存 memory 是两步：</p>
+<ol>
+<li>把具体 memory 写进独立文件</li>
+<li>再在 <code>MEMORY.md</code> 里加一个一行指针</li>
+</ol>
+<p>为什么这么麻烦？因为系统知道入口文件天然会被频繁加载，而频繁加载的东西一旦变胖，整套上下文就会被它慢慢拖成一个不好收拾的胖子。</p>
+<p>这也是为什么 <code>memdir.ts</code> 里专门有 <code>MAX_ENTRYPOINT_LINES = 200</code> 和 <code>MAX_ENTRYPOINT_BYTES = 25_000</code>。超过了，系统会直接 <code>truncateEntrypointContent()</code>，并在结尾追加明确警告：只加载了一部分，请把细节移到 topic files。</p>
+<p>这套做法特别像一个见过太多失控索引的人。它不相信大家会天然克制，所以把“入口必须短”做成硬约束。因为入口文件一旦既当目录又当正文，最后就既不是目录，也不是正文，只是一个谁都不愿再读第二遍的烂尾摘要。</p>
+<p>从 Harness Engineering 的角度看，这里抽出来的原则非常清楚：长期记忆必须分成“入口”和“正文”。入口负责低成本寻址，正文负责高密度承载。把两者混为一谈，最终一定是入口失效，随后整套记忆系统退化成摆设。</p>
+<h2 id="54-session-memory-说明，短期连续性也不能靠聊天记录硬扛">5.4 Session memory 说明，短期连续性也不能靠聊天记录硬扛</h2>
+<p>只有长期 memory 还不够。代理系统真正难受的地方，常常在于“这轮之前我们到底做到哪一步了”。这是一次会话内部的连续性问题。</p>
+<p>Claude Code 在 <code>src/services/SessionMemory/prompts.ts</code> 里专门给这件事建了一套模板。默认模板里有这些栏目：</p>
+<ul>
+<li><code>Current State</code></li>
+<li><code>Task specification</code></li>
+<li><code>Files and Functions</code></li>
+<li><code>Workflow</code></li>
+<li><code>Errors &amp; Corrections</code></li>
+<li><code>Codebase and System Documentation</code></li>
+<li><code>Learnings</code></li>
+<li><code>Key results</code></li>
+<li><code>Worklog</code></li>
+</ul>
+<p>你一看就知道，这不是给人抒情的。它关心的是：现在做到哪了，踩过什么坑，改过哪些文件，后面该接什么。更有意思的是更新 prompt 的语气。源码里明确要求：</p>
+<ul>
+<li>只能用 Edit tool 更新 notes file</li>
+<li>不要提 note-taking 这件事本身</li>
+<li>不要改模板结构</li>
+<li><code>Current State</code> 必须始终反映最近工作</li>
+<li>每节都要信息密集，但要控制预算</li>
+</ul>
+<p>这说明 session memory 在 Claude Code 里并非“另存一份聊天记录”，它会把当前会话萃取成一种可继续工作的操作说明书。它不求完整复刻对话，而求压缩出未来继续干活所必需的骨架。</p>
+<p>这里有个极其工程化的细节。<code>prompts.ts</code> 里定义了 <code>MAX_SECTION_LENGTH = 2000</code> 和 <code>MAX_TOTAL_SESSION_MEMORY_TOKENS = 12000</code>。超过预算，系统不会夸你记得细，而是要求你 aggressively condense，尤其优先保留 <code>Current State</code> 和 <code>Errors &amp; Corrections</code>。</p>
+<p>这很能说明问题。真正成熟的系统，会把“为继续工作保留最有用的部分”当成美德。因为上下文预算是工作内存。工作内存的第一职责是可操作。</p>
+<h2 id="55-自动-compact-说明，上下文治理首先是预算治理">5.5 自动 compact 说明，上下文治理首先是预算治理</h2>
+<p>到这里，长期规则、持久 memory、session memory 都有了，但上下文还是会膨胀。于是 Claude Code 在 <code>src/services/compact/autoCompact.ts</code> 里进一步承认一个现实：不管你多会整理，只要对话够长，总会逼近窗口边缘。</p>
+<p><code>getEffectiveContextWindowSize()</code> 先把模型 context window 减去一笔保留给 summary 输出的预算。<code>MAX_OUTPUT_TOKENS_FOR_SUMMARY</code> 直接预留了 20,000 tokens。也就是说，系统先假定 compact 本身要花钱，绝不把窗口吃到只剩一口气时才想起求生。</p>
+<p>接着 <code>getAutoCompactThreshold()</code> 又在有效窗口上再扣掉 <code>AUTOCOMPACT_BUFFER_TOKENS = 13_000</code>。警告阈值、错误阈值、手动 compact 预留空间，也都各自分出 buffer。</p>
+<p>这套数字背后有个很朴素的道理：上下文治理需要提前为失败和恢复留出余地。不留余地的系统，平时看着像节俭，出事时就暴露出本质，那只是把风险账单留给下一轮。</p>
+<p>更有意思的是 <code>AutoCompactTrackingState</code>。它不仅记 <code>compacted</code>，还记 <code>turnCounter</code>、<code>turnId</code> 和 <code>consecutiveFailures</code>。这说明 autocompact 是一段会被追踪、会失败、会被限流的运行时行为。</p>
+<p>源码甚至写了一个很直白的注释：全球每天曾经浪费大量 API calls 在连续失败的 autocompact 上，所以 <code>MAX_CONSECUTIVE_AUTOCOMPACT_FAILURES = 3</code>，再失败就触发 circuit breaker。这里的气质非常好，像一个终于受不了浪费的人：你可以失败，但不能无限次、无记忆地失败。</p>
+<h2 id="56-compactconversation-说明，摘要要重建可继续工作的上下文">5.6 <code>compactConversation()</code> 说明，摘要要重建可继续工作的上下文</h2>
+<p>很多人一听 compact，会以为就是“把前面聊天摘要一下”。Claude Code 的实现要复杂得多。<code>src/services/compact/compact.ts</code> 里的 <code>compactConversation()</code> 真正做的，是把原有上下文拆开、摘要、再注入必要附件，重新搭出一个还能工作的后 compact 世界。</p>
+<p>先看压缩前的清洗。<code>stripImagesFromMessages()</code> 会把图片、文档替成 <code>[image]</code>、<code>[document]</code> 之类的标记；<code>stripReinjectedAttachments()</code> 会把反正之后还要重新注入的 attachment 先剥掉，免得浪费 token。仅这两个动作就说明，compact 会有选择地丢掉那些“对于摘要无用、但对于 token 极贵”的部分。</p>
+<p>再看摘要失败时的处理。源码里有 <code>truncateHeadForPTLRetry()</code>，专门应对“compact 请求自己都 prompt too long”的尴尬场面。也就是说，系统不仅承认主流程会爆，还承认“救火工具本身也会爆”。这很像真实世界，而不是 demo。</p>
+<p>而在 compact 成功之后，Claude Code 做的不是简单保留一条 summary。它还会：</p>
+<ul>
+<li>清空旧的 <code>readFileState</code></li>
+<li>重新生成 post-compact file attachments</li>
+<li>把 plan attachment 补回来</li>
+<li>把 plan mode attachment 补回来</li>
+<li>把 invoked skills attachment 补回来</li>
+<li>把 deferred tools、agent listing、MCP instructions 的 delta attachment 重新补回来</li>
+<li>执行 session start hooks 和 post-compact hooks</li>
+<li>写 compact boundary message，记录 pre-compact token 数与边界信息</li>
+</ul>
+<p>这些动作合在一起，意思很明确：compact 的目标是把“继续干活所需的运行时环境”重新铺平。摘要只是中间产物，不是最终目的。</p>
+<p>所以 compact 在 Claude Code 里更像一次受控重启，而不是一次聊天总结。旧上下文会被转译成新的工作底座。这种设计很值得记住，因为很多系统只做前半截，结果 compact 之后虽然“还记得大概”，却已经失去了工具状态、计划状态、附件状态，接下来还得再花几轮找回自己。</p>
+<h2 id="57-上下文治理的关键是保留工作语义">5.7 上下文治理的关键是保留工作语义</h2>
+<p>如果只看 <code>compact.ts</code> 的后半段，会发现一个贯穿始终的倾向：Claude Code 真正在意的是把工作语义保住。</p>
+<p>例如它会恢复最近访问文件的 attachment，因为这些文件往往构成当前工作面的局部现实；它会恢复 plan mode，因为否则模型压缩完以后可能忘了自己还处在 plan discipline 里；它会保留 invoked skills 的内容，但又给每个 skill 设置 token cap，避免 skill 本身在 post-compact 阶段反客为主。</p>
+<p>源码里这句话很有味道：per-skill truncation beats dropping。意思是，即使要裁，也优先保住开头那一段最关键指令，而不是整个扔掉。这就是治理，不是纯粹节流。纯节流是砍，治理是知道该砍哪里、该保什么。</p>
+<p>从这里可以抽出一个相当稳妥的经验：上下文系统应该优先保留能维持行动语义的东西，而不是优先保留看起来信息量最大的东西。文件细节、当前计划、错误修正、技能约束，这些都直接决定下一步能不能做对。反过来，冗长的历史对话、重复出现的附件、已经可由运行时重新发现的东西，就没必要再占着座位。</p>
+<h2 id="58-从源码里可以提炼出的第五个原则">5.8 从源码里可以提炼出的第五个原则</h2>
+<p>这一章最后可以压成一句话：</p>
+<blockquote>
+<p>上下文是工作内存。治理它的目标是支持系统继续工作。</p>
+</blockquote>
+<p>Claude Code 的源码在几个层面共同支持这个判断：</p>
+<ul>
+<li><code>claudemd.ts</code> 把长期指令分层加载，说明稳定规则要和临时对话分开治理</li>
+<li><code>memdir.ts</code> 把 <code>MEMORY.md</code> 定义成索引并强行截断，说明入口文件必须短而可寻址</li>
+<li><code>SessionMemory/prompts.ts</code> 用固定模板提炼会话连续性，并对 section 和总量设预算，说明短期记忆也必须结构化</li>
+<li><code>autoCompact.ts</code> 为 compact 预留输出预算、缓冲区和失败熔断，说明上下文窗口要按风险来经营</li>
+<li><code>compact.ts</code> 在摘要后恢复计划、文件、技能、工具附件和 hook 状态，说明 compact 的目标是重建工作语义，而不是写一段好看的总结</li>
+</ul>
+<p>如果把这些抽象成可迁移的工程原则，大概有这样几条：</p>
+<ul>
+<li>长期规则、长期记忆、会话连续性，应该分层，不该混写</li>
+<li>入口型记忆必须短小，否则整个系统会被入口拖垮</li>
+<li>session summary 应该服务于“继续工作”，而不是服务于“回忆完整”</li>
+<li>compact 是上下文治理主路径</li>
+<li>压缩后的上下文必须保住运行语义，而不是只保住语言表面</li>
+</ul>
+<p>下一章要讲的是这套治理系统碰到极限时怎么办。因为一个真系统终究会出错：prompt too long，max output tokens，hook 死循环，恢复分支相互打架。到那时你才看得出来，一个代理系统到底是在“赌不出事”，还是在认真设计出事之后怎么活下去。</p>
+
+                                
+                                </section>
+<aside class="hb-agentway-cta" aria-label="Continue on AgentWay"><p class="hb-agentway-cta__eyebrow">Continue On AgentWay</p><h3>先注册，再把书里的判断落成练习、路径和项目。</h3><p>这些书帮你看清 Harness 的骨架。AgentWay 负责把它接成可执行学习路径：先免费注册，拿到基础 track 与进度记录；准备动手做练习、flashcards、capstone 和进阶专题时，再升级高级版。</p><div class="hb-agentway-cta__actions"><a class="hb-agentway-cta__link hb-agentway-cta__link--primary" href="https://agentway.dev/zh/auth">免费注册</a><a class="hb-agentway-cta__link" href="https://agentway.dev/zh/pricing">解锁进阶路径</a></div></aside>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="chapter-04-tools-permissions-interrupts.html" class="navigation navigation-prev " aria-label="Previous page: 第 4 章 工具、权限与中断：为什么代理不能直接碰世界">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="chapter-06-errors-and-recovery.html" class="navigation navigation-next " aria-label="Next page: 第 6 章 错误与恢复：出错后仍能继续工作的代理系统">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"第 5 章 上下文治理：Memory、CLAUDE.md 与 Compact 是预算制度","level":"1.8","depth":1,"next":{"title":"第 6 章 错误与恢复：出错后仍能继续工作的代理系统","level":"1.9","depth":1,"path":"chapter-06-errors-and-recovery.md","ref":"chapter-06-errors-and-recovery.md","articles":[]},"previous":{"title":"第 4 章 工具、权限与中断：为什么代理不能直接碰世界","level":"1.7","depth":1,"path":"chapter-04-tools-permissions-interrupts.md","ref":"chapter-04-tools-permissions-interrupts.md","articles":[]},"dir":"ltr"},"config":{"plugins":[],"cover_alt":"封面：Harness Engineering：Claude Code 设计指南","root":".","styles":{"website":"styles/website.css","pdf":"styles/pdf.css"},"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"release_date":"2026-04-01","theme":"default","author":"OpenAI Codex","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"outputs":{"print_html":"exported/book1-claude-code-print.html","pdf":"exported/book1-claude-code.pdf","print_pdf":"exported/book1-claude-code-print.pdf","book_pdf":"exported/book1-claude-code-book.pdf"},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"cover_image":"assets/cover-wxb.svg","readme_path":"index.md","title_page_lines":["从会用 Agent，到做出 Agent PoC","https://agentway.dev"],"variables":{},"title":"Harness Engineering：Claude Code 设计指南","language":"zh-Hans","gitbook":"*","description":"一部从 Claude Code 源码抽象 AI 编程系统工程原则的中文书稿。"},"file":{"path":"chapter-05-context-memory-compact.md","mtime":"2026-04-02T04:09:21.164Z","type":"markdown"},"gitbook":{"version":"6.1.7","time":"2026-04-02T04:11:42.555Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <noscript>
+        <style>
+            .honkit-cloak {
+                display: block !important;
+            }
+        </style>
+    </noscript>
+    <script>
+        // Restore sidebar state as critical path for prevent layout shift
+        function __init__getSidebarState(defaultValue){
+            var baseKey = "";
+            var key = baseKey + ":sidebar";
+            try {
+                var value = localStorage[key];
+                if (value === undefined) {
+                    return defaultValue;
+                }
+                var parsed = JSON.parse(value);
+                return parsed == null ? defaultValue : parsed;
+            } catch (e) {
+                return defaultValue;
+            }
+        }
+        function __init__restoreLastSidebarState() {
+            var isMobile = window.matchMedia("(max-width: 600px)").matches;
+            if (isMobile) {
+                // Init last state if not mobile
+                return;
+            }
+            var sidebarState = __init__getSidebarState(true);
+            var book = document.querySelector(".book");
+            // Show sidebar if it enabled
+            if (sidebarState && book) {
+                book.classList.add("without-animation", "with-summary");
+            }
+        }
+
+        try {
+            __init__restoreLastSidebarState();
+        } finally {
+            var book = document.querySelector(".book");
+            book.classList.remove("honkit-cloak");
+        }
+    </script>
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/@honkit/honkit-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

@@ -1,0 +1,36 @@
+digraph ArchDesignFlow {
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=12];
+    edge [fontname="PingFang SC", fontsize=10];
+    graph [fontname="PingFang SC", fontsize=14];
+    nodesep=0.6;
+    ranksep=0.7;
+
+    prd [label="prd.md\n（已验证）", fillcolor="#C8E6C9", color="#2E7D32", penwidth=2];
+    tech [label="technical-research.md\n技术选型依据", fillcolor="#BBDEFB", color="#1565C0", penwidth=2];
+
+    subgraph cluster_arch {
+        label="create-architecture 产出";
+        style=filled; fillcolor="#FFF3E0"; color="#E65100"; penwidth=2;
+        fontname="PingFang SC";
+
+        stack [label="技术栈选型 + 理由\n（引用 technical-research）", fillcolor="#FFE0B2"];
+        components [label="系统组件划分\n（模块边界 + 职责）", fillcolor="#FFE0B2"];
+        schema [label="数据库 Schema 设计\n（核心表结构）", fillcolor="#FFCC80"];
+        api [label="API 接口规范\n（路由 + 请求/响应格式）", fillcolor="#FFcc80"];
+        security [label="安全策略\n（认证 + 权限 + 数据保护）", fillcolor="#FFB74D"];
+        deploy [label="部署架构\n（服务拓扑 + 环境配置）", fillcolor="#FFB74D"];
+    }
+
+    epics [label="epics-and-stories.md\n（下游消费）", fillcolor="#D1C4E9", color="#6A1B9A", penwidth=2];
+
+    prd -> stack;
+    prd -> components;
+    tech -> stack [label="引用选型结论"];
+    stack -> schema;
+    components -> api;
+    schema -> api;
+    api -> security;
+    security -> deploy;
+    deploy -> epics [label="架构完成后拆解任务"];
+}

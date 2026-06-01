@@ -1,0 +1,52 @@
+digraph CodeReviewLayers {
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=11];
+    edge [fontname="PingFang SC", fontsize=9];
+    graph [fontname="PingFang SC", fontsize=14];
+    nodesep=0.7;
+    ranksep=0.8;
+
+    code [label="代码变更\n（dev-story 产出）", fillcolor="#C8E6C9", color="#2E7D32", penwidth=2, shape=note];
+
+    subgraph cluster_parallel {
+        label="并行三层审查";
+        style=filled; fillcolor="#E3F2FD"; color="#1565C0"; penwidth=2;
+        fontname="PingFang SC";
+
+        layer1 [label="🔍 Blind Hunter\n不看需求，只看代码\n找潜在 bug 和安全漏洞", fillcolor="#BBDEFB", color="#1565C0", penwidth=2];
+        layer2 [label="🧩 Edge Case Hunter\n走查所有分支路径\n找未处理的边界情况", fillcolor="#B39DDB", color="#6A1B9A", penwidth=2];
+        layer3 [label="✅ Acceptance Auditor\n对照 story AC 逐项检查\n验证功能符合需求", fillcolor="#C8E6C9", color="#2E7D32", penwidth=2];
+    }
+
+    triage [label="汇总 + 分类（Triage）", fillcolor="#FFE0B2", color="#E65100", penwidth=2, shape=diamond];
+
+    subgraph cluster_severity {
+        label="问题严重程度";
+        style=filled; fillcolor="#FFF9C4"; color="#F57F17"; penwidth=2;
+        fontname="PingFang SC";
+
+        critical [label="🔴 Critical\n必须修复，阻断合并", fillcolor="#FFCDD2", color="#C62828", penwidth=2];
+        high [label="🟠 High\n强烈建议修复", fillcolor="#FFE0B2", color="#E65100"];
+        medium [label="🟡 Medium\n建议修复", fillcolor="#FFF9C4", color="#F9A825"];
+        low [label="🔵 Low\n可忽略", fillcolor="#E3F2FD", color="#1565C0"];
+    }
+
+    result_fail [label="返回 dev-story 修复", fillcolor="#FFCDD2", color="#C62828", penwidth=2, shape=ellipse];
+    result_pass [label="通过审查\n更新 sprint-status: done", fillcolor="#A5D6A7", color="#2E7D32", penwidth=2, shape=ellipse];
+
+    code -> layer1;
+    code -> layer2;
+    code -> layer3;
+    layer1 -> triage;
+    layer2 -> triage;
+    layer3 -> triage;
+    triage -> critical;
+    triage -> high;
+    triage -> medium;
+    triage -> low;
+    critical -> result_fail [label="有 Critical"];
+    high -> result_pass [label="仅 High 以下", style=dashed];
+    result_pass -> result_pass [style=invis];
+    low -> result_pass [style=dashed];
+    medium -> result_pass [style=dashed];
+}

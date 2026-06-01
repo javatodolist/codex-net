@@ -1,0 +1,52 @@
+digraph AgentRoles {
+    rankdir=LR;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=11];
+    edge [fontname="PingFang SC", fontsize=9];
+    graph [fontname="PingFang SC", fontsize=14];
+    nodesep=0.5;
+    ranksep=1.2;
+
+    // 阶段列（左）
+    subgraph cluster_phases {
+        label="开发阶段";
+        style=filled;
+        fillcolor="#ECEFF1";
+        color="#546E7A";
+        penwidth=2;
+        fontname="PingFang SC";
+        node [fillcolor="#CFD8DC"];
+
+        p1 [label="分析 & 研究"];
+        p2 [label="产品规划"];
+        p3 [label="技术方案"];
+        p4 [label="开发执行"];
+        p5 [label="质量保障"];
+    }
+
+    // Agent 列（右）
+    subgraph cluster_agents {
+        label="负责 Agent";
+        style=filled;
+        fillcolor="#FFF3E0";
+        color="#E65100";
+        penwidth=2;
+        fontname="PingFang SC";
+
+        a1 [label="🔍 Analyst\n头脑风暴 / 产品简报 / 研究", fillcolor="#FFE0B2"];
+        a2 [label="📋 PM\nPRD / Epics / Stories", fillcolor="#FFCC80"];
+        a3 [label="🏗 Architect\n技术架构 / 就绪检查", fillcolor="#FFB74D"];
+        a4 [label="💻 Dev\nStory 实现 / 代码编写", fillcolor="#C8E6C9", color="#2E7D32"];
+        a5 [label="🛡 QA + TEA\n代码审查 / 测试架构", fillcolor="#F8BBD0", color="#880E4F"];
+        sm [label="📅 SM（Scrum Master）\nSprint 计划 / Story 准备 / 进度追踪", fillcolor="#BBDEFB", color="#1565C0"];
+    }
+
+    p1 -> a1;
+    p2 -> a2;
+    p3 -> a3;
+    p4 -> a4;
+    p5 -> a5;
+
+    // SM 横跨多个阶段
+    p2 -> sm [style=dashed, color="#1565C0"];
+    p4 -> sm [style=dashed, color="#1565C0"];
+}

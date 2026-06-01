@@ -1,0 +1,67 @@
+digraph TEAFlow {
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=12];
+    edge [fontname="PingFang SC", fontsize=10];
+    graph [fontname="PingFang SC", fontsize=14];
+    nodesep=0.7;
+    ranksep=0.8;
+
+    subgraph cluster_strategy {
+        label="测试策略";
+        style=filled;
+        fillcolor="#EDE7F6";
+        color="#4A148C";
+        penwidth=2;
+        fontname="PingFang SC";
+
+        td [label="testarch-test-design\n基于风险的测试规划", fillcolor="#D1C4E9"];
+        nfr [label="testarch-nfr\n非功能需求评估", fillcolor="#D1C4E9"];
+    }
+
+    subgraph cluster_infra {
+        label="测试基础设施";
+        style=filled;
+        fillcolor="#E3F2FD";
+        color="#0D47A1";
+        penwidth=2;
+        fontname="PingFang SC";
+
+        fw [label="testarch-framework\nPlaywright/Cypress 脚手架", fillcolor="#BBDEFB"];
+        ci [label="testarch-ci\nCI/CD 质量门禁配置", fillcolor="#BBDEFB"];
+    }
+
+    subgraph cluster_impl {
+        label="测试实现";
+        style=filled;
+        fillcolor="#E8F5E9";
+        color="#1B5E20";
+        penwidth=2;
+        fontname="PingFang SC";
+
+        atdd [label="testarch-atdd\n先写失败测试（TDD 红阶段）", fillcolor="#C8E6C9"];
+        auto [label="testarch-automate\n扩展自动化测试覆盖率", fillcolor="#C8E6C9"];
+        qa [label="qa-generate-e2e-tests\n实现后补充 E2E 测试", fillcolor="#C8E6C9"];
+    }
+
+    subgraph cluster_review {
+        label="测试质量保障";
+        style=filled;
+        fillcolor="#FCE4EC";
+        color="#880E4F";
+        penwidth=2;
+        fontname="PingFang SC";
+
+        review [label="testarch-test-review\n测试质量评分（0-100）", fillcolor="#F8BBD0"];
+        trace [label="testarch-trace\n追溯矩阵 + 质量门禁决策", fillcolor="#F8BBD0"];
+    }
+
+    td -> fw [label="制定策略后"];
+    fw -> ci [label="框架就绪后"];
+    td -> atdd [label="指导测试设计"];
+    atdd -> auto [label="覆盖率不足时补充"];
+    auto -> qa [label="实现后补 E2E"];
+    qa -> review [label="审查测试质量"];
+    nfr -> review [style=dashed];
+    review -> trace [label="生成追溯矩阵"];
+    trace -> ci [label="配置发布门禁", style=dashed, color="#0D47A1"];
+}

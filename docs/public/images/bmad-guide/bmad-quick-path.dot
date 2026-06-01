@@ -1,0 +1,37 @@
+digraph QuickPath {
+    rankdir=LR;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=11];
+    edge [fontname="PingFang SC", fontsize=9];
+    graph [fontname="PingFang SC", fontsize=14];
+    nodesep=0.8;
+    ranksep=1.0;
+
+    need [label="小改动需求\n（Bug / 小功能 / 工具脚本）", fillcolor="#FFF9C4", color="#F57F17", penwidth=2, shape=ellipse];
+
+    subgraph cluster_qs {
+        label="路径 A：quick-spec + quick-dev（推荐）";
+        style=filled; fillcolor="#E8F5E9"; color="#2E7D32"; penwidth=2;
+        fontname="PingFang SC";
+
+        qs [label="/bmad-quick-spec\n5 分钟生成技术规范\n• 实现要点\n• 影响范围\n• 测试要点", fillcolor="#C8E6C9", color="#2E7D32", penwidth=2];
+        qd [label="/bmad-quick-dev\n读取规范直接实现\n• 严格遵守规范约束\n• 最小化变更范围", fillcolor="#A5D6A7", color="#2E7D32", penwidth=2];
+        spec_file [label="quick-spec-xxx.md\n（可复查可存档）", fillcolor="#DCEDC8", shape=note];
+    }
+
+    subgraph cluster_qq {
+        label="路径 B：quick-dev-new-preview（实验性）";
+        style=filled; fillcolor="#E3F2FD"; color="#1565C0"; penwidth=2;
+        fontname="PingFang SC";
+
+        qq [label="/bmad-quick-dev-new-preview\n一步完成全流程\n理解意图→规划→实现→审查", fillcolor="#BBDEFB", color="#1565C0", penwidth=2];
+    }
+
+    done [label="代码完成\n建议仍然跑 code-review", fillcolor="#C8E6C9", color="#2E7D32", penwidth=2, shape=ellipse];
+
+    need -> qs;
+    need -> qq;
+    qs -> spec_file [label="生成"];
+    spec_file -> qd [label="实现"];
+    qd -> done;
+    qq -> done;
+}

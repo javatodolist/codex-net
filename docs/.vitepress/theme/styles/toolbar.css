@@ -1,0 +1,124 @@
+.floating-toolbar {
+  position: fixed;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.floating-toolbar .toolbar-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  color: var(--vp-c-text-2);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.floating-toolbar .toolbar-btn:hover {
+  color: var(--vp-c-brand-1);
+  box-shadow: 0 0 16px rgba(217, 119, 87, 0.25);
+  transform: scale(1.05);
+}
+
+.dark .floating-toolbar .toolbar-btn:hover {
+  box-shadow: 0 0 16px rgba(241, 138, 94, 0.25);
+}
+
+.floating-toolbar .toolbar-btn .tooltip {
+  position: absolute;
+  right: 50px;
+  white-space: nowrap;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.floating-toolbar .toolbar-btn:hover .tooltip {
+  opacity: 1;
+}
+
+/* Popup overlay */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-content {
+  background: var(--vp-c-bg);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.popup-content h3 {
+  margin: 0 0 16px;
+  color: var(--vp-c-text-1);
+  font-size: 18px;
+}
+
+.popup-content img {
+  display: block;
+  max-width: 240px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.popup-content .qr-canvas {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.popup-content .qr-canvas canvas {
+  display: block;
+}
+
+.popup-close {
+  margin-top: 16px;
+  padding: 6px 20px;
+  border: none;
+  border-radius: 6px;
+  background: var(--vp-c-brand-1);
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.popup-close:hover {
+  background: var(--vp-c-brand-2);
+}
+
+@media (max-width: 768px) {
+  .floating-toolbar {
+    display: none;
+  }
+}

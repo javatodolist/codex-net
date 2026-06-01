@@ -1,0 +1,17 @@
+.dark .vp-doc h1,
+.dark .vp-doc h2,
+.dark .vp-doc h3,
+.dark .vp-doc h4,
+.dark .vp-doc h5,
+.dark .vp-doc h6 {
+  color: #f1f5f9;
+}
+
+.dark .vp-doc p,
+.dark .vp-doc li {
+  color: #cbd5e1;
+}
+
+.dark .vp-doc blockquote {
+  color: #94a3b8;
+}

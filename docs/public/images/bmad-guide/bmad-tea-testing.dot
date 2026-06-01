@@ -1,0 +1,70 @@
+digraph TEATesting {
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=11];
+    edge [fontname="PingFang SC", fontsize=9];
+    graph [fontname="PingFang SC", fontsize=14];
+    nodesep=0.7;
+    ranksep=0.9;
+
+    story [label="Story 文件\n（含 AC 验收标准）", fillcolor="#FFF9C4", color="#F57F17", penwidth=2, shape=note];
+
+    subgraph cluster_setup {
+        label="第一步：搭框架（一次性）";
+        style=filled; fillcolor="#E3F2FD"; color="#1565C0"; penwidth=2;
+        fontname="PingFang SC";
+        fw [label="/bmad-testarch-framework\nPlaywright / Cypress 配置\nfixtures + page objects", fillcolor="#BBDEFB", color="#1565C0", penwidth=2];
+    }
+
+    subgraph cluster_red {
+        label="第二步：红阶段（每个 Story）";
+        style=filled; fillcolor="#FFEBEE"; color="#C62828"; penwidth=2;
+        fontname="PingFang SC";
+        atdd [label="/bmad-testarch-atdd\n按 AC 生成验收测试\n（全部失败 = 正常）", fillcolor="#FFCDD2", color="#C62828", penwidth=2];
+        red [label="测试全部 🔴 失败\n（期望状态）", fillcolor="#EF9A9A", color="#C62828", shape=ellipse];
+        atdd -> red;
+    }
+
+    subgraph cluster_green {
+        label="第三步：绿阶段";
+        style=filled; fillcolor="#E8F5E9"; color="#2E7D32"; penwidth=2;
+        fontname="PingFang SC";
+        dev [label="/bmad-dev-story\n实现代码\n让测试通过", fillcolor="#C8E6C9", color="#2E7D32", penwidth=2];
+        green [label="测试全部 🟢 通过\n（目标状态）", fillcolor="#A5D6A7", color="#2E7D32", shape=ellipse];
+        dev -> green;
+    }
+
+    subgraph cluster_review {
+        label="第四步：质量审查";
+        style=filled; fillcolor="#FFF3E0"; color="#E65100"; penwidth=2;
+        fontname="PingFang SC";
+        cr [label="/bmad-code-review\n三层并行审查", fillcolor="#FFE0B2", color="#E65100", penwidth=2];
+        fix [label="修复 Critical 问题\n（回到 dev-story）", fillcolor="#FFCC80", color="#E65100"];
+        pass [label="审查通过\nstatus: done", fillcolor="#C8E6C9", color="#2E7D32", shape=ellipse];
+    }
+
+    subgraph cluster_ci {
+        label="持续集成（每次 Push 自动触发）";
+        style=filled; fillcolor="#EDE7F6"; color="#6A1B9A"; penwidth=2;
+        fontname="PingFang SC";
+        ci [label="/bmad-testarch-ci\nGitHub Actions 流水线", fillcolor="#D1C4E9", color="#6A1B9A", penwidth=2];
+        gate1 [label="单元测试\n覆盖率 ≥ 70%", fillcolor="#B39DDB"];
+        gate2 [label="E2E 测试\n（PR 触发）", fillcolor="#B39DDB"];
+        gate3 [label="Lint 检查\ngolangci + ESLint", fillcolor="#B39DDB"];
+        merge [label="允许合并\n到 main", fillcolor="#A5D6A7", color="#2E7D32", shape=ellipse];
+        ci -> gate1;
+        ci -> gate2;
+        ci -> gate3;
+        gate1 -> merge;
+        gate2 -> merge;
+        gate3 -> merge;
+    }
+
+    story -> fw [label="初始化（一次）", style=dashed];
+    story -> atdd [label="每个 Story"];
+    red -> dev [label="开始实现"];
+    green -> cr;
+    cr -> fix [label="有 Critical"];
+    fix -> dev [label="继续修复", style=dashed];
+    cr -> pass [label="无 Critical"];
+    pass -> ci [label="Push 代码"];
+}

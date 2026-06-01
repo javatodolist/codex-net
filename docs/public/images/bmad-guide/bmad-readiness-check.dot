@@ -1,0 +1,40 @@
+digraph ReadinessCheck {
+    rankdir=LR;
+    node [shape=box, style="rounded,filled", fontname="PingFang SC", fontsize=11];
+    edge [fontname="PingFang SC", fontsize=9];
+    graph [fontname="PingFang SC", fontsize=14];
+    nodesep=0.6;
+    ranksep=1.0;
+
+    subgraph cluster_inputs {
+        label="输入文档";
+        style=filled; fillcolor="#ECEFF1"; color="#546E7A"; penwidth=2;
+        fontname="PingFang SC";
+        prd [label="prd.md ✓", fillcolor="#C8E6C9"];
+        ux [label="ux-design.md ✓", fillcolor="#C8E6C9"];
+        arch [label="architecture.md ✓", fillcolor="#C8E6C9"];
+        epics [label="epics-and-stories.md ✓", fillcolor="#C8E6C9"];
+    }
+
+    check [label="check-implementation-readiness\nArchitect Agent 逐项检查", fillcolor="#BBDEFB", color="#1565C0", penwidth=2, shape=diamond];
+
+    subgraph cluster_result {
+        label="检查结果";
+        style=filled; fillcolor="#FFF9C4"; color="#F57F17"; penwidth=2;
+        fontname="PingFang SC";
+        pass [label="✓ 全部通过\n可以开始 Sprint Planning", fillcolor="#A5D6A7", color="#2E7D32", penwidth=2];
+        fail [label="✗ 发现问题\n返回修复对应文档", fillcolor="#FFCDD2", color="#C62828", penwidth=2];
+    }
+
+    sprint [label="sprint-planning\n开始开发执行", fillcolor="#E3F2FD", color="#1565C0", penwidth=2, shape=ellipse];
+
+    prd -> check;
+    ux -> check;
+    arch -> check;
+    epics -> check;
+    check -> pass [label="所有文档对齐\n无矛盾无缺失"];
+    check -> fail [label="发现矛盾\n或关键信息缺失"];
+    fail -> prd [label="修复 PRD", style=dashed, color="#C62828", constraint=false];
+    fail -> arch [label="修复架构", style=dashed, color="#C62828", constraint=false];
+    pass -> sprint;
+}

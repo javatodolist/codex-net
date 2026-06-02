@@ -31,12 +31,12 @@
 
 .floating-toolbar .toolbar-btn:hover {
   color: var(--vp-c-brand-1);
-  box-shadow: 0 0 16px rgba(217, 119, 87, 0.25);
+  box-shadow: 0 0 16px rgba(16, 163, 127, 0.25);
   transform: scale(1.05);
 }
 
 .dark .floating-toolbar .toolbar-btn:hover {
-  box-shadow: 0 0 16px rgba(241, 138, 94, 0.25);
+  box-shadow: 0 0 16px rgba(31, 184, 143, 0.25);
 }
 
 .floating-toolbar .toolbar-btn .tooltip {

@@ -1,22 +1,22 @@
 :root {
-  --vp-c-brand-1: #d97757;
-  --vp-c-brand-2: #c45a3a;
-  --vp-c-brand-3: #a34830;
-  --vp-c-brand-soft: rgba(217, 119, 87, 0.14);
+  --vp-c-brand-1: #10a37f;
+  --vp-c-brand-2: #0d8a6c;
+  --vp-c-brand-3: #0a6e55;
+  --vp-c-brand-soft: rgba(16, 163, 127, 0.14);
 
   --vp-button-brand-border: transparent;
   --vp-button-brand-text: #fff;
-  --vp-button-brand-bg: #d97757;
+  --vp-button-brand-bg: #10a37f;
   --vp-button-brand-hover-border: transparent;
   --vp-button-brand-hover-text: #fff;
-  --vp-button-brand-hover-bg: #c45a3a;
+  --vp-button-brand-hover-bg: #0d8a6c;
   --vp-button-brand-active-border: transparent;
   --vp-button-brand-active-text: #fff;
-  --vp-button-brand-active-bg: #a34830;
+  --vp-button-brand-active-bg: #0a6e55;
 
   --vp-home-hero-name-color: transparent;
-  --vp-home-hero-name-background: linear-gradient(135deg, #d97757 10%, #f7a989 100%);
-  --vp-home-hero-image-background-image: linear-gradient(135deg, rgba(217, 119, 87, 0.2) 10%, rgba(247, 169, 137, 0.2) 100%);
+  --vp-home-hero-name-background: linear-gradient(135deg, #10a37f 10%, #19c37d 100%);
+  --vp-home-hero-image-background-image: linear-gradient(135deg, rgba(16, 163, 127, 0.2) 10%, rgba(25, 195, 125, 0.2) 100%);
   --vp-home-hero-image-filter: blur(44px);
 
   /* glass morphism */
@@ -26,16 +26,16 @@
 }
 
 .dark {
-  --vp-c-brand-1: #f18a5e;
-  --vp-c-brand-2: #f7a989;
-  --vp-c-brand-3: #fbd0c0;
-  --vp-c-brand-soft: rgba(241, 138, 94, 0.14);
+  --vp-c-brand-1: #1fb88f;
+  --vp-c-brand-2: #4dd0ab;
+  --vp-c-brand-3: #9fe7d2;
+  --vp-c-brand-soft: rgba(31, 184, 143, 0.14);
 
-  --vp-button-brand-bg: #f18a5e;
-  --vp-button-brand-hover-bg: #f7a989;
-  --vp-button-brand-active-bg: #d97757;
+  --vp-button-brand-bg: #1fb88f;
+  --vp-button-brand-hover-bg: #4dd0ab;
+  --vp-button-brand-active-bg: #10a37f;
 
-  --vp-home-hero-name-background: linear-gradient(135deg, #f18a5e 10%, #fbd0c0 100%);
+  --vp-home-hero-name-background: linear-gradient(135deg, #1fb88f 10%, #9fe7d2 100%);
 
   --glass-bg: rgba(30, 30, 30, 0.7);
   --glass-border: rgba(255, 255, 255, 0.08);

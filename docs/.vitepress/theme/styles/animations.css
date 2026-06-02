@@ -9,12 +9,12 @@
 
 /* Glow on hover */
 .glow-hover:hover {
-  box-shadow: 0 0 20px rgba(217, 119, 87, 0.3);
+  box-shadow: 0 0 20px rgba(16, 163, 127, 0.3);
   transition: box-shadow 0.3s ease;
 }
 
 .dark .glow-hover:hover {
-  box-shadow: 0 0 20px rgba(241, 138, 94, 0.3);
+  box-shadow: 0 0 20px rgba(31, 184, 143, 0.3);
 }
 
 /* Smooth transitions */

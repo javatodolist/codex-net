@@ -91,6 +91,18 @@ export default withMermaid(
       ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' }],
       ['link', { rel: 'icon', href: '/favicon.ico' }],
       ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' }],
+      // 百度统计（codex.it8090.cn）
+      [
+        'script',
+        {},
+        `var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?14c65368025af90dded423efdae122a0";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();`,
+      ],
     ],
 
     // 开启后 VitePress 内置 sitemap 会自动用 git 最后提交时间填充 <lastmod>

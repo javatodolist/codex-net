@@ -1,7 +1,7 @@
 ---
 title: 快速开始 | Code80 使用文档
 shortTitle: 快速开始
-description: Code80 快速开始：注册账号、登录、购买额度、创建 API 令牌，并配置 Codex、CC-Switch 等工具。
+description: Code80 快速开始：注册账号、登录、购买额度、创建 API 令牌，并配置 Claude Code、Codex、CC-Switch 等工具。
 layout: doc
 ---
 
@@ -116,7 +116,7 @@ layout: doc
 
 ![步骤截图](/images/code80/QuickStart/005.webp)
 
-* 令牌名称：用于区分不同用途，例如 `Codex`。
+* 令牌名称：用于区分不同用途，例如 `Claude Code`、`Codex`、`Gemini`。
 * 令牌分组：必须选择，分组决定这个令牌可以使用哪些模型。
 * 过期时间：默认“永不过期”，也可以按需要设置有效期。
 * 新建数量：一般保持 `1` 即可。
@@ -124,7 +124,7 @@ layout: doc
 * 访问限制：不熟悉时建议先保持默认，不要开启模型限制或 IP 白名单。
 
 ::: warning 令牌分组一定要选对
-令牌分组会直接影响可用模型。Codex 请选 **Codex** 分组。如果分组选错，很容易出现“模型不存在”或无法调用的问题。
+令牌分组会直接影响可用模型。比如 Claude Code 选 **CC** 分组、Codex 选 **Codex** 分组；使用 Gemini 模型（Cline / Roo Code 等）时选 **Gemini** 或 **Gemini-slb** 分组。如果分组选错，很容易出现“模型不存在”或无法调用的问题。
 
 如果你不确定每个分组适合什么场景，请先阅读 [Code80 各分组介绍](/code80/token/2-group)。
 :::
@@ -147,7 +147,7 @@ layout: doc
 
 ## 第五步：环境检查
 
-在配置 Codex 之前，请先确认本机已经正确安装 Node.js。
+在配置 Claude Code、Codex 或 Grok Build 之前，请先确认本机已经正确安装 Node.js。
 
 在 Windows、macOS 或 Linux 终端中执行：
 
@@ -160,19 +160,23 @@ npm list -g --depth-0
 如果提示“命令未找到”或类似错误，说明当前环境还没有安装 Node.js，或安装后没有正确加入系统环境变量。请先完成 Node.js 安装，再重新执行上面的命令确认。
 
 ::: warning 必须先完成环境检查
-CLI 工具依赖 Node.js 和 npm。环境没有准备好时，后续安装 Codex 可能失败。
+CLI 工具依赖 Node.js 和 npm。环境没有准备好时，后续安装 Claude Code、Codex 等都可能失败。
 :::
 
 ## 第六步：配置 CLI 工具
 
-本站提供 Codex 的命令行配置教程。
+Code80 支持在命令行中使用 Claude Code、Codex、Grok Build。
+
+::: warning 不提供 Gemini CLI 教程
+Google 官方 **Gemini CLI** 目前稳定性较差，几乎无法正常使用，本站**不再提供** 其安装与配置教程。使用 Gemini 模型请参考 [Gemini 相关问题](/code80/faq/Gemini)。
+:::
 
 ### 基础条件
 
 开始配置 CLI 前，请先完成以下步骤：
 
 1. 完成 [环境检查](/code80/register/5-env)，确保 Node.js 和 npm 可以正常使用。
-2. 完成 [安装 CLI](/code80/cli/1-env)，安装 Codex。
+2. 完成 [安装 CLI](/code80/cli/1-env)，安装 Claude Code、Codex 或 Grok Build。
 
 ### API 端点说明
 
@@ -190,19 +194,24 @@ https://code.ai80.vip/v1
 ```
 :::
 
+如果使用的是 Claude Code 等专用配置，请以对应教程中的示例为准。
+
 ::: tip 推荐配置
 为了让配置过程进行轻便简单，我们**极力推荐** 使用 Github 开源项目 [CC-Switch](https://github.com/farion1231/cc-switch) 来对使用环境进行配置。
 
-[CC-Switch 配置 Codex 教程](/code80/ccswitch/)
+[CC-Switch 配置 Claude Code、Codex 教程](/code80/ccswitch/)
 
 如果你是老鸟，或者不愿意使用此工具，可以参考以下 CLI 配置教程文档，**但我们还是极力推荐使用此工具，能省很多时间！**
 :::
 
 ::: tip CLI 手动配置教程传送门
-注意：配置 Codex 时，请一定先完成上方基础条件，确保 Node.js、npm 和 Codex CLI 都可以正常使用。
+注意：不管你是使用哪个 CLI，请一定先完成上方基础条件，确保 Node.js、npm 和对应 CLI 都可以正常使用。
+
+[Claude Code配置教程](/code80/cli/2-claude)
 
 [Codex配置教程](/code80/cli/3-codex)
 
+[Grok Build配置教程](/code80/cli/6-grok-build)
 :::
 
 ## 相关链接

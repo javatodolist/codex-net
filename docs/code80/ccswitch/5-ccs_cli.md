@@ -22,6 +22,11 @@ CC Switch CLI 适合服务器、SSH、macOS 终端和自动化场景使用。如
 
 统一管理多个 AI 编码 CLI 的供应商配置，并支持 MCP、Skills、提示词、本地代理和环境检查等功能。
 
+::: warning 不提供 Gemini CLI 教程
+本站不再提供 Gemini CLI 的配置说明。若 CC-Switch CLI 仍带有 `--app gemini`，请忽略；使用 Gemini 模型请参考 [Gemini 相关问题](/code80/faq/Gemini)。
+
+![步骤截图](/images/code80/CC-Switch/018.webp)
+:::
 
 ## CC-Switch CLI 是什么
 
@@ -95,6 +100,7 @@ cc-switch
 如果要直接配置某个应用，可以加 `--app`：
 
 ```bash
+cc-switch --app claude
 cc-switch --app codex
 ```
 
@@ -130,11 +136,13 @@ cc-switch env tools
 建议先运行一次目标 CLI 或帮助命令，让它创建自己的配置目录：
 
 ```bash
+claude --help
 codex --help
 ```
 
 然后在 Code80 创建对应分组的令牌：
 
+* Claude Code：创建 **CC 分组** 令牌
 * Codex：创建 **Codex 分组** 令牌
 
 ## 配置 Code80
@@ -142,7 +150,7 @@ codex --help
 第一次配置推荐使用 TUI，因为它会展示 Code80 模板和需要填写的字段。
 
 ::: tip 提示
-下面以 Codex 为例。进入 TUI 时请使用 `--app codex`。Claude Code 配置见 [Claude 站点](https://claude.it8090.cn/code80/ccswitch/5-ccs_cli)。
+下面以 Claude Code 为例。Codex 的配置方式相同，只需要用 `--app codex` 切换目标应用。
 :::
 
 1. 运行以下命令进入交互界面：
@@ -173,7 +181,19 @@ cc-switch --app codex
 
 ![步骤截图](/images/code80/CC-Switch/022.webp)
 
-6. 打开 Codex 测试是否可以正常对话：
+6. 如果你配置的是 Claude Code，进入 `设置`，找到 `跳过 Claude Code 初次安装确认`，确认开启。
+
+![步骤截图](/images/code80/CC-Switch/023.png)
+
+这个选项会向 `~/.claude.json` 写入 `hasCompletedOnboarding=true`，避免 Claude Code 首次启动时停在安装确认流程。
+
+7. 打开对应 CLI 测试是否可以正常对话：
+
+```bash
+claude
+```
+
+Codex 使用：
 
 ```bash
 codex
@@ -186,9 +206,9 @@ cc-switch                         # 进入交互界面
 cc-switch env tools               # 检查本地 CLI 是否安装
 cc-switch env check               # 检查环境变量冲突
 
-cc-switch --app codex provider list
-cc-switch --app codex provider current
-cc-switch --app codex provider switch <id>
+cc-switch provider list           # 查看 Claude 供应商
+cc-switch provider current        # 查看当前 Claude 供应商
+cc-switch provider switch <id>    # 切换 Claude 供应商
 
 cc-switch --app codex provider list
 
@@ -206,7 +226,7 @@ cc-switch update                     # 更新 CC-Switch CLI
 例如你可以这样说：
 
 ```bash
-帮我运行 cc-switch --app codex provider list，看一下当前有哪些 Codex Provider。
+帮我运行 cc-switch provider list，看一下当前有哪些 Claude Provider。
 ```
 
 ```bash
@@ -214,11 +234,11 @@ cc-switch update                     # 更新 CC-Switch CLI
 ```
 
 ```bash
-帮我运行 cc-switch env check --app codex，检查有没有环境变量覆盖配置。
+帮我运行 cc-switch env check --app claude，检查有没有环境变量覆盖配置。
 ```
 
 ```bash
-帮我切换到 Code80 provider，然后运行 codex 测试是否能正常回复。
+帮我切换到 Code80 provider，然后运行 claude 测试是否能正常回复。
 ```
 
 这种方式适合已经熟悉终端的人。AI 助手负责执行命令和解释结果，你只需要确认关键操作，比如切换 Provider、覆盖配置文件或删除配置。
@@ -230,6 +250,7 @@ cc-switch update                     # 更新 CC-Switch CLI
 请先确认目标 CLI 已经初始化配置目录。可以运行一次：
 
 ```bash
+claude --help
 codex --help
 ```
 

@@ -1,7 +1,7 @@
 ---
 title: 常见问题 | Code80 使用文档
 shortTitle: 常见问题
-description: Code80 常见问题索引：Codex。
+description: Code80 常见问题索引：Claude Code、Codex、Gemini、Grok Build。
 layout: doc
 ---
 
@@ -9,9 +9,10 @@ layout: doc
 
 使用 Code80 时如果遇到报错、模型不存在、账单异常或客户端连不上，优先查阅对应工具的常见问题。令牌分组介绍与本页能解答后续 **90%** 的疑问。
 
+- [Claude Code 相关问题](/code80/faq/CC)
 - [Codex 相关问题](/code80/faq/Codex)
-
-Claude Code、Gemini、Grok Build 等其他工具的常见问题，请见 [Claude 站点 Code80 文档](https://claude.it8090.cn/code80/faq/)。
+- [Gemini 相关问题](/code80/faq/Gemini)
+- [Grok Build 相关问题](/code80/faq/GrokBuild)
 
 ## 相关链接
 

@@ -11,6 +11,12 @@ layout: doc
 
 ## 本目录文章
 
+- [Code80 快速开始](/code80/)
+- [注册账号](/code80/register/1-register)
+- [Codex 配置教程](/code80/cli/3-codex)
+- [Codex 常见问题](/code80/faq/Codex)
+
+
 - [30秒装好10行命令开干 Codex CLI 正在把终端写代码变成普通人的默认选项](/codex-domestic/30秒装好10行命令开干-Codex-CLI-正在把终端写代码变成普通人的默认选项)
 - [保姆级教程，通过GACCode在国内使用Claudecode、Codex！](/codex-domestic/阿里云开发者社区-4111d9-保姆级教程，通过GACCode在国内使用Claudecode、Codex！)
 - [Codex 保姆级入门教程（6000字长文）](/codex-domestic/百度百家号-e1afff-Codex 保姆级入门教程（6000字长文）)

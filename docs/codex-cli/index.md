@@ -12,6 +12,14 @@ layout: doc
 
 ## 推荐阅读路径
 
+用 Code80 国内直连时，优先看：
+
+- [Code80 快速开始](/code80/)
+- [Codex 配置教程](/code80/cli/3-codex)
+- [CC-Switch](/code80/ccswitch/)
+- [Codex 常见问题](/code80/faq/Codex)
+
+
 1. 先看安装与配置，确认本机环境可用。
 2. 再看审批模式与项目规则，避免越权操作。
 3. 然后看工作流实践，把 Codex 接入真实项目。

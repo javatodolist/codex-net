@@ -91,11 +91,48 @@ sudo dpkg -i cc-switch_x.x.x_amd64.deb
 
 ::: warning 注意
 **请你最好进行此步的环境检查步骤！！！
-如果你有经验，能确认你的 Nodejs 环境以及 Codex 的 CLI 安装没问题，配置目录也都存在，可以忽略这一步，直接进入以下的 CC Switch 配置**
+如果你有经验，能确认你的 Nodejs 环境以及 Claude Code、Codex 的 CLI 安装没问题，配置目录也都存在，可以忽略这一步，直接进入以下的 CC Switch 配置**
 
 点击右侧传送门查看 [如何进行环境检查？](/code80/cli/1-env)
 :::
 
+::: warning 不提供 Gemini CLI 教程
+本站不再提供 Gemini CLI 的配置教程（该工具几乎无法正常使用）。CC-Switch 若仍显示 Gemini 入口，请忽略；使用 Gemini 模型请改用 Cline / Roo Code 等，见 [Gemini 相关问题](/code80/faq/Gemini)。
+:::
+
+## Claude Code配置
+
+1. 打开已安装的 CC Switch，你会看到如下图所示的初始界面
+
+![步骤截图](/images/code80/CC-Switch/guide/003.jpg)
+
+2. 在顶部应用切换栏中选择 **Claude Code**
+
+![步骤截图](/images/code80/CC-Switch/guide/004.jpg)![步骤截图](/images/code80/CC-Switch/guide/005.jpg)
+
+3. 点击右上角 `+`，在预设供应商中选择 **Code80**
+
+![步骤截图](/images/code80/CC-Switch/guide/006.jpg)
+
+4. 回顾 [创建 API 令牌](/code80/register/4-token)，在 Code80 中创建 **CC** 分组的令牌，然后复制 API Key
+
+![步骤截图](/images/code80/CC-Switch/guide/007.jpg)
+
+5. 在供应商配置中找到 `API Key`，填入刚才复制的 API Key，再点击右下角 **添加**
+
+![步骤截图](/images/code80/CC-Switch/guide/008.jpg)
+
+6. 添加成功后，回到主界面找到刚配置的 Code80，点击右侧 **启用** ；显示 **使用中** 即表示切换成功
+
+![步骤截图](/images/code80/CC-Switch/guide/009.jpg)
+
+7. 点击左上角 **设置** ，在通用页面找到 `跳过 Claude Code 初次安装确认`，务必开启
+
+![步骤截图](/images/code80/CC-Switch/guide/010.jpg)
+
+8. 在终端运行 `claude`，看到对话界面并能正常回复，即表示配置完成
+
+![步骤截图](/images/code80/CC-Switch/guide/011.jpg)
 
 ## Codex配置
 
@@ -130,6 +167,26 @@ sudo dpkg -i cc-switch_x.x.x_amd64.deb
 ## 用量查询配置
 
 CC Switch 可以在 Code80 供应商卡片中显示已用额度和剩余额度。具体设置方法请查看 [用量查询配置](/code80/ccswitch/4-usage-query)。
+
+## Claude Desktop配置
+
+::: tip 和上面的"Claude Code配置"是两回事
+Claude Desktop（桌面客户端）和 Claude Code（命令行/VSCode 插件）在 CC Switch 里是两个独立入口，配置文件互不相通，需要分别配置。
+:::
+
+1. 打开 CC Switch，在左侧应用切换器中选择 **Claude Desktop** 入口。找不到的话，去 `设置 → 通用 → 应用可见性` 确认没有被隐藏
+
+2. 首次进入时没有供应商，点击 **"将 Claude Code 中已有的供应商导入"** 按钮，可以把上面 Claude Code 配好的供应商一键带过来；也可以点右上角 `+` 手动添加，接口地址填 `https://code.ai80.vip`，API Key 用 **CC** 分组令牌
+
+3. 导入或添加后，在供应商卡片上点击 **启用**
+
+::: tip 一定要完全重启 Claude Desktop
+Claude Desktop **不会像 Claude Code 那样热重载配置** ，每次切换供应商后，必须彻底退出程序再重新打开才会生效。
+:::
+
+4. 判断是否生效：完全重启后正常发一条消息，**能收到回复就是生效了** 。这里**没有单独的"测试连接"按钮** ，不用纠结有没有测试通过
+
+详细步骤、导入注意事项和排查方法，见 [CC Switch · Claude Desktop 配置](/code80/ccswitch/4-claude-desktop)
 
 ## ChatGPT 接入
 

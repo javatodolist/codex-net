@@ -7,7 +7,7 @@ layout: doc
 
 # 环境检查
 
-在配置 Codex 之前，请先确认本机已经正确安装 Node.js。
+在配置 Claude Code、Codex 或 Grok Build 之前，请先确认本机已经正确安装 Node.js。
 
 ## 检查 Node.js 环境
 
@@ -22,7 +22,7 @@ npm list -g --depth-0
 如果提示“命令未找到”或类似错误，说明当前环境还没有安装 Node.js，或安装后没有正确加入系统环境变量。请先完成 Node.js 安装，再重新执行上面的命令确认。
 
 ::: warning 必须先完成环境检查
-CLI 工具依赖 Node.js 和 npm。环境没有准备好时，后续安装 Codex 可能失败。
+CLI 工具依赖 Node.js 和 npm。环境没有准备好时，后续安装 Claude Code、Codex 等都可能失败。
 :::
 
 ## 继续安装 CLI

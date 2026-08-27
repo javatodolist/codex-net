@@ -1,8 +1,13 @@
 ---
 title: 注册账号
 shortTitle: 注册账号
-description: 介绍如何在 Code80 中完成「注册账号」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: 注册账号。本文属于Codex 国内使用专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex 国内使用
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # 注册账号
@@ -33,3 +38,8 @@ layout: doc
 ::: tip 温馨提示
 邮箱会用于接收验证与通知；密码建议使用字母、数字和特殊字符组合。请妥善保管登录凭证，避免账号被盗用。
 :::
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

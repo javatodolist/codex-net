@@ -1,8 +1,13 @@
 ---
 title: DS接入Codex
 shortTitle: DS 接入 Codex
-description: 介绍如何在 Code80 中完成「DS接入Codex」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: DS接入Codex。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # DS接入Codex
@@ -51,3 +56,8 @@ Codex 原生面向 OpenAI 模型。接入 DeepSeek 后可能出现模型元数�
 如果使用 ChatGPT，同样发送一条测试消息；能够正常回复即表示应用侧配置生效。
 
 ![步骤截图](/images/code80/CC-Switch/guide/034.jpg)
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

@@ -1,8 +1,13 @@
 ---
 title: 配置 CLI 工具
 shortTitle: 配置 CLI
-description: 介绍如何在 Code80 中完成「配置 CLI 工具」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: 配置 CLI 工具。本文属于Codex 国内使用专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex 国内使用
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # 配置 CLI 工具
@@ -57,3 +62,8 @@ https://code.ai80.vip/v1
 
 [Grok Build配置教程](/code80/cli/6-grok-build)
 :::
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

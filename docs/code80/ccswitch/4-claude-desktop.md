@@ -1,8 +1,13 @@
 ---
 title: Claude Desktop配置
 shortTitle: CCS Desktop
-description: 介绍如何在 Code80 中完成「Claude Desktop配置」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: Claude Desktop配置。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Claude Code
 ---
 
 # Claude Desktop配置
@@ -79,3 +84,8 @@ CC Switch 的 Claude Desktop 面板**没有"测试连接"按钮** ，但部分�
 * 暂不支持在 Linux 上写入 Claude Desktop 的第三方配置
 * 配置文件由 CC Switch 自动维护，不建议手动编辑
 * 想恢复官方登录，随时可以切换回 `Claude Desktop Official`，这时不需要 API Key
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

@@ -1,8 +1,13 @@
 ---
 title: Grok Build配置
 shortTitle: Grok Build
-description: 介绍如何在 Code80 中完成「Grok Build配置」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: Grok Build配置。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # Grok Build配置
@@ -205,3 +210,8 @@ ok
 ```
 
 更多排查问题请参考 [Grok Build 常见问题](/code80/faq/GrokBuild)。
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

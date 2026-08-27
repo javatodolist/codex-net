@@ -1,8 +1,13 @@
 ---
 title: Claude Code配置
 shortTitle: Claude Code
-description: 介绍如何在 Code80 中完成「Claude Code配置」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: Claude Code配置。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Claude Code
 ---
 
 # Claude Code配置
@@ -44,3 +49,8 @@ layout: doc
 
 这类配置是否生效，请直接以 Claude Code 内的实际对话结果为准，并在 Claude Code 中完成最终测试。
 :::
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

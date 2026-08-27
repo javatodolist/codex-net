@@ -1,8 +1,13 @@
 ---
 title: Nano Banana2 Pro绘图教程
 shortTitle: Banana 绘图
-description: 介绍如何在 Code80 中完成「Nano Banana2 Pro绘图教程」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: Nano Banana2 Pro绘图教程。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # Nano Banana2 Pro绘图教程
@@ -50,3 +55,8 @@ layout: doc
 11. 尽情发挥你的想象吧~
 
 ![步骤截图](/images/code80/Paint/banana/11.webp)
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

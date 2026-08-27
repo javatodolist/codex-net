@@ -1,8 +1,13 @@
 ---
 title: AionUI
 shortTitle: AionUI
-description: 介绍如何在 Code80 中完成「AionUI」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: AionUI。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # AionUI
@@ -129,3 +134,8 @@ sudo dpkg -i AionUi-x.x.x-linux-amd64.deb
 
 * [❓ FAQ 常见问题](https://github.com/iOfficeAI/AionUi/wiki/FAQ-Chinese) \- 问题解答和故障排除
 * [🔧 配置与使用教程](https://github.com/iOfficeAI/AionUi/wiki/Configuration-Guides-Chinese) \- 完整配置文档
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

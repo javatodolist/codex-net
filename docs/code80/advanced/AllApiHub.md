@@ -1,8 +1,13 @@
 ---
 title: All API Hub
 shortTitle: All API Hub
-description: 介绍如何在 Code80 中完成「All API Hub」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: All API Hub。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # All API Hub
@@ -178,3 +183,8 @@ Code80 提供丰富的模型与 API 调用入口，All API Hub 则让这些账�
 * [Code80 官网](https://code.ai80.vip)
 * [All API Hub GitHub 仓库](https://github.com/qixing-jk/all-api-hub)
 * [All API Hub 文档](https://all-api-hub.qixing1217.top)
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

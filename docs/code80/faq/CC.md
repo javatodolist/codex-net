@@ -1,8 +1,13 @@
 ---
 title: Claude Code相关问题
 shortTitle: Claude Code
-description: Claude Code 常见问题：账单出现其他模型、VSCode 插件配置、无法连接 Anthropic、切换 200K 上下文等。
-layout: doc
+description: Claude Code 常见问题：账单出现其他模型、VSCode 插件配置、无法连接 Anthropic、切换 200K 上下文等。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Claude Code
 ---
 
 # Claude Code相关问题
@@ -243,3 +248,8 @@ Claude Code 默认会在每次对话中自动获取当前仓库的 git 状态信
 :::
 
 完整推荐配置与各字段说明，见 [Claude Code配置 · 配置项说明](/code80/cli/2-claude)。
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

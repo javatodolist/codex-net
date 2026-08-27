@@ -1,8 +1,13 @@
 ---
 title: WorkBuddy
 shortTitle: WorkBuddy
-description: 介绍如何在 Code80 中完成「WorkBuddy」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: WorkBuddy。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # ![步骤截图](/images/code80/icon/workbuddy.png)WorkBuddy
@@ -80,3 +85,8 @@ API Key 所属分组决定了可用的模型。配置时填写的模型名称必
 6. 返回任务对话界面，点击输入框右下角的模型选择器，选择刚刚配置的模型。发送一条消息并正常收到回复，即表示 Code80 接入成功。
 
 ![步骤截图](/images/code80/Advanced/WorkBuddy/06.jpg)
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

@@ -1,8 +1,13 @@
 ---
 title: GPT-Image-2 绘图教程
 shortTitle: GPT Image
-description: 介绍如何在 Code80 中完成「GPT-Image-2 绘图教程」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: GPT-Image-2 绘图教程。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # GPT-Image-2 绘图教程
@@ -275,3 +280,8 @@ Code80 的 `gpt-image-2` 不支持通过 `/v1/chat/completions` 出图。请不�
 放行后，同类请求可以等待更久并正常返回。下图中请求在约 1.6 分钟后返回图片；如果使用更高分辨率或更高质量选项，生成时间还可能继续增加。为了减少不可控的网络中断，建议绘图请求尽量直连 `code.ai80.vip`，不要经过会限制长连接的代理或中转网络。
 
 ![步骤截图](/images/code80/Paint/gpt-image-2/11.webp)
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

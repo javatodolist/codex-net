@@ -1,8 +1,13 @@
 ---
 title: 通用步骤
 shortTitle: 通用步骤
-description: 介绍如何在 Code80 中完成「通用步骤」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: 通用步骤。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # 通用步骤
@@ -93,3 +98,8 @@ sudo dpkg -i cc-switch_x.x.x_amd64.deb
 
 点击右侧传送门查看 [如何进行环境检查？](/code80/cli/1-env)
 :::
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

@@ -1,8 +1,13 @@
 ---
 title: CC Switch CLI 使用
 shortTitle: CCS CLI
-description: 介绍如何在 Code80 中完成「CC Switch CLI 使用」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: CC Switch CLI 使用。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # CC Switch CLI 使用
@@ -266,3 +271,8 @@ codex --help
 cc-switch env check --app claude
 cc-switch env check --app codex
 ```
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

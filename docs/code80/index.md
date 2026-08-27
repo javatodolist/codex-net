@@ -1,8 +1,13 @@
 ---
 title: 快速开始 | Code80 使用文档
 shortTitle: 快速开始
-description: Code80 快速开始：注册账号、登录、购买额度、创建 API 令牌，并配置 Claude Code、Codex、CC-Switch 等工具。
-layout: doc
+description: Code80 快速开始：注册账号、登录、购买额度、创建 API 令牌，并配置 Claude Code、Codex、CC-Switch 等工具。本文属于Codex 国内使用专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex 国内使用
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # 快速开始
@@ -226,3 +231,8 @@ https://code.ai80.vip/v1
 - [CC-Switch 使用教程](/code80/ccswitch/)
 - [CLI 配置教程](/code80/cli/)
 - [常见问题](/code80/faq/)
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

@@ -1,8 +1,13 @@
 ---
 title: GPT接入CC
 shortTitle: GPT 接入 CC
-description: 介绍如何在 Code80 中完成「GPT接入CC」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: GPT接入CC。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Claude Code
 ---
 
 # GPT接入CC
@@ -101,3 +106,8 @@ layout: doc
 
 Code80 不推荐用户将 GPT 模型接入 Claude Code，也不对该方案的稳定性、兼容性、输出效果、额度消耗或任何衍生问题承担责任。你可以用于测试、研究和理解路由逻辑，但不建议把它作为日常稳定工作流使用。
 :::
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

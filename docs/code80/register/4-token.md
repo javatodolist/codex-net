@@ -1,8 +1,13 @@
 ---
 title: 创建 API 令牌
 shortTitle: 创建令牌
-description: 介绍如何在 Code80 中完成「创建 API 令牌」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: 创建 API 令牌。本文属于Codex 国内使用专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex 国内使用
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # 创建 API 令牌
@@ -50,3 +55,8 @@ layout: doc
 ![步骤截图](/images/code80/QuickStart/007.webp)
 
 如果你想了解折扣含义，可以点击模型广场右上方的“折扣说明”。
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

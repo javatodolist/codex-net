@@ -1,8 +1,13 @@
 ---
 title: Codex相关问题
 shortTitle: Codex
-description: Codex 常见问题：账单出现其他模型、Windows 乱码、VSCode 插件模型、401/403、网络连接等。
-layout: doc
+description: Codex 常见问题：账单出现其他模型、Windows 乱码、VSCode 插件模型、401/403、网络连接等。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # Codex相关问题
@@ -290,3 +295,8 @@ plan","type":"usage_not_included","param":null,"code":null,"plan_type":"basic"}}
 1. 使用`Ctrl+C`来打断你的对话，如在vscode中，请点击停止按钮
 2. 重新发起对话进行尝试，观察是否再次出现此问题
 3. 如果重试3次以上无效，带上你的报错截图，在群内咨询客服或群友
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

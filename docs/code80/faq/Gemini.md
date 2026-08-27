@@ -1,8 +1,13 @@
 ---
 title: Gemini相关问题
 shortTitle: Gemini
-description: Gemini 常见问题：不提供 Gemini CLI 教程，以及如何在 Cline 中通过 OpenAI 兼容接口使用 Gemini。
-layout: doc
+description: Gemini 常见问题：不提供 Gemini CLI 教程，以及如何在 Cline 中通过 OpenAI 兼容接口使用 Gemini。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # Gemini相关问题
@@ -102,3 +107,8 @@ Model ID: gemini-3-pro-preview
 #### 5. 完成配置
 
 单击右上角 **Done**。
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

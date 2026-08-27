@@ -1,8 +1,13 @@
 ---
 title: Grok Build相关问题
 shortTitle: Grok Build
-description: Grok Build 常见问题：env_key 用法、模型不存在、effort 不生效、第三方模型需关闭 workflows。
-layout: doc
+description: Grok Build 常见问题：env_key 用法、模型不存在、effort 不生效、第三方模型需关闭 workflows。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # Grok Build相关问题
@@ -40,3 +45,8 @@ enabled = false
 ```
 
 workflows 是 Grok 模型专属能力，第三方模型不支持，开启状态下会导致对话失败。修改配置后需要重启 Grok Build 才会重新加载。
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

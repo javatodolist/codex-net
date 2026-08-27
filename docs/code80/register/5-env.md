@@ -1,8 +1,13 @@
 ---
 title: 环境检查
 shortTitle: 环境检查
-description: 介绍如何在 Code80 中完成「环境检查」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: 环境检查。本文属于Codex 国内使用专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex 国内使用
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # 环境检查
@@ -28,3 +33,8 @@ CLI 工具依赖 Node.js 和 npm。环境没有准备好时，后续安装 Claud
 ## 继续安装 CLI
 
 环境检查通过后，可以继续阅读 [配置 CLI 工具](/code80/register/6-cli)。如果你想看更完整的环境安装说明，也可以参考 [CLI 环境检查通用步骤](/code80/cli/1-env)。
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

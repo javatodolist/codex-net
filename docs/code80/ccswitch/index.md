@@ -1,8 +1,13 @@
 ---
 title: CC-Switch使用教程
 shortTitle: CC-Switch
-description: 介绍如何在 Code80 中完成「CC-Switch使用教程」。步骤与原文一致，接口与控制台均指向 Code80。
-layout: doc
+description: CC-Switch使用教程。本文属于Codex CLI专题，面向国内用户梳理 Code80 接入与配置步骤。
+date: 2026-08-27
+category: Codex CLI
+tag:
+  - Code80
+  - AI编程
+  - Codex CLI
 ---
 
 # CC-Switch使用教程
@@ -201,3 +206,8 @@ Claude Desktop **不会像 Claude Code 那样热重载配置** ，每次切换�
 CC-Switch CLI 同时提供完整 CLI 命令和完整 TUI 界面，适合服务器、SSH、macOS 终端和自动化场景使用。你也可以让 Claude Code / Codex 直接调用 `cc-switch` 命令来检查、切换和修复配置。
 
 查看详细教程：[CC Switch CLI 使用](/code80/ccswitch/5-ccs_cli)
+
+## 本站相关栏目
+
+- [Codex CLI](/codex-cli/)
+- [Codex 国内使用](/codex-domestic/)

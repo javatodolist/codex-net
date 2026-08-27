@@ -6,6 +6,9 @@ import path from 'path'
 import { statSync } from 'fs'
 import { nav } from './nav'
 import { sidebar } from './sidebar'
+import { code80Sidebar } from './sidebar-code80'
+
+(sidebar as Record<string, typeof code80Sidebar>)['/code80/'] = code80Sidebar
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const SITE_URL = 'https://codex-net.local'
@@ -111,7 +114,7 @@ export default withMermaid(
     sitemap: {
       hostname: SITE_URL,
       transformItems: (items) => {
-        const HIGH_PRIORITY_DIRS = ['codex-cli/', 'codex-domestic/', 'comparisons/']
+        const HIGH_PRIORITY_DIRS = ['codex-cli/', 'codex-domestic/', 'comparisons/', 'code80/']
         return items.map((item) => {
           const url = item.url
           if (url === '' || url === 'index' || url === 'index.html') {

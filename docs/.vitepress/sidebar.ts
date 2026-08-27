@@ -2,6 +2,18 @@ import type { DefaultTheme } from 'vitepress'
 
 export const sidebar: DefaultTheme.Sidebar = {
   "/codex-cli/": [
+    {
+      text: "Code80 接入 Codex",
+      collapsed: false,
+      items: [
+        { text: "Code80 使用文档", link: "/code80/" },
+        { text: "注册账号", link: "/code80/register/1-register" },
+        { text: "Codex配置", link: "/code80/cli/3-codex" },
+        { text: "CC-Switch", link: "/code80/ccswitch/" },
+        { text: "ChatGPT 接入", link: "/code80/ccswitch/6-codex-app" },
+        { text: "Codex FAQ", link: "/code80/faq/Codex" },
+      ],
+    },
     { text: "Codex CLI", items: [
       { text: "首页", link: "/codex-cli/" },
       { text: "你还在等官方插件？OpenAI Codex 接进 IntelliJ，这事到 2025 年还是得“曲线救国”", link: "/codex-cli/2026-03-26-5ec60d-你还在等官方插件-OpenAI-Codex-接进-IntelliJ-这事到-2025-年还是得-曲线救国" },
@@ -31,6 +43,17 @@ export const sidebar: DefaultTheme.Sidebar = {
     ] },
   ],
   "/codex-domestic/": [
+    {
+      text: "Code80 国内接入",
+      collapsed: false,
+      items: [
+        { text: "快速开始", link: "/code80/" },
+        { text: "注册账号", link: "/code80/register/1-register" },
+        { text: "购买额度", link: "/code80/register/3-quota" },
+        { text: "创建 API 令牌", link: "/code80/register/4-token" },
+        { text: "令牌分组介绍", link: "/code80/token/2-group" },
+      ],
+    },
     { text: "Codex 国内使用", items: [
       { text: "首页", link: "/codex-domestic/" },
       { text: "不想为 Codex 再单独掏钱？这 4 种用法，能把成本压到最低", link: "/codex-domestic/30秒装好10行命令开干-Codex-CLI-正在把终端写代码变成普通人的默认选项" },

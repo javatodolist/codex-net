@@ -95,7 +95,11 @@ main() {
     # Step 1: 本地构建
     if [ "$SKIP_BUILD" = false ]; then
         print_info "Step 1/4: 本地构建..."
-        pnpm install
+        # node (not pnpm run): pnpm run would install first and hide a bad allowBuilds policy
+        node "$SCRIPT_DIR/check-allow-builds.mjs" --self-test
+        node "$SCRIPT_DIR/check-allow-builds.mjs"
+        # --yes covers remaining prompts so a non-TTY run cannot hang under set -e
+        pnpm install --yes
         pnpm run build
         print_success "构建完成"
     else

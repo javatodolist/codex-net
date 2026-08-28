@@ -14,7 +14,7 @@ tag:
 
 ## AionUi 介绍
 
-![AionUi - Cowork with Your CLI AI Agent](/images/code80/Advanced/AionUI/aionui-banner-1%20copy.webp)
+![AionUi - Cowork with Your CLI AI Agent](/images/code80/Advanced/AionUI/aionui-banner-1-copy.webp)
 
 ### Cowork with Your CLI AI Agent
 
@@ -42,7 +42,7 @@ tag:
 * ✅ **多模型切换** \- 灵活切换 Gemini、Claude、OpenAI、Qwen、Ollama 等主流模型
 * ✅ **完全免费开源** \- Apache-2.0 许可证，完全免费使用
 
-![AionUi支持多端同步](/images/code80/Advanced/AionUI/webui%20banner.webp) _AionUi WebUI 的案例_
+![AionUi支持多端同步](/images/code80/Advanced/AionUI/webui-banner.webp) _AionUi WebUI 的案例_
 
 ## 软件下载
 
